@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🎮 人生 RPG</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0d1a;--surface:#141428;--surface2:#1a1a35;--border:#2a2a55;
+  --accent:#7c3aed;--accent2:#06b6d4;--gold:#f59e0b;--green:#10b981;
+  --red:#ef4444;--orange:#f97316;--purple:#8b5cf6;--text:#e2e8f0;--muted:#64748b;
+  --pixel:'Press Start 2P',monospace;--body:'Noto Sans TC',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 75% 15%,rgba(255,255,255,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 45% 65%,rgba(255,255,255,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 88% 55%,rgba(255,255,255,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 30% 80%,rgba(255,255,255,.3) 0%,transparent 100%)}
+
+.sync-banner{padding:6px 16px;font-size:11px;display:flex;align-items:center;gap:6px;justify-content:center;border-bottom:1px solid transparent;transition:all .3s}
+.sync-banner.ok{background:linear-gradient(90deg,rgba(16,185,129,.15),rgba(6,182,212,.15));border-color:rgba(16,185,129,.3);color:var(--green)}
+.sync-banner.syncing{background:linear-gradient(90deg,rgba(245,158,11,.1),rgba(245,158,11,.05));border-color:rgba(245,158,11,.3);color:var(--gold)}
+.sync-banner.error{background:linear-gradient(90deg,rgba(239,68,68,.1),rgba(239,68,68,.05));border-color:rgba(239,68,68,.3);color:var(--red)}
+.sync-dot{width:6px;height:6px;background:currentColor;border-radius:50%;box-shadow:0 0 6px currentColor;animation:pulse 2s infinite}
+.sync-banner.error .sync-dot{animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.header{background:linear-gradient(135deg,#1a0a3d,#0d1a3a);border-bottom:2px solid var(--accent);
+  padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 30px rgba(124,58,237,.3)}
+.pixel-title{font-family:var(--pixel);font-size:9px;color:var(--gold);text-shadow:0 0 10px rgba(245,158,11,.8)}
+.player-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
+
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:56px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:12px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
+.tab:hover:not(.active){color:var(--text)}
+
+.content{padding:16px;max-width:600px;margin:0 auto;position:relative;z-index:1}
+.page{display:none}.page.active{display:block}
+
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--pixel);font-size:8px;color:var(--muted)}
+
+.player-card{background:linear-gradient(135deg,#1a0a3d,#0a1f3d);border:1px solid var(--accent);
+  border-radius:16px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}
+.player-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;
+  background:radial-gradient(circle,rgba(124,58,237,.3),transparent 70%);border-radius:50%}
+.player-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.avatar{width:50px;height:50px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;
+  flex-shrink:0;box-shadow:0 0 20px rgba(124,58,237,.4)}
+.player-info{flex:1}
+.player-name{font-size:16px;font-weight:900}
+.player-title{font-size:11px;color:var(--gold);margin-top:2px}
+.exp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.exp-label{font-size:11px;color:var(--muted)}
+.exp-val{font-size:11px;color:var(--accent2);font-weight:700}
+.exp-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.exp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px rgba(6,182,212,.6)}
+.stats-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.stat-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;
+  padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
+
+.week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.week-label{font-size:13px;font-weight:700;color:var(--gold)}
+.date-label{font-size:11px;color:var(--muted)}
+
+.category{margin-bottom:20px}
+.cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.cat-icon{font-size:16px}.cat-name{font-size:13px;font-weight:700}
+
+.habit-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px;margin-bottom:8px;transition:all .2s}
+.habit-item:hover{border-color:var(--accent);transform:translateY(-1px)}
+.habit-item.failed{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
+.habit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.habit-name{font-size:13px;font-weight:700}
+.habit-meta{display:flex;align-items:center;gap:6px}
+.lv-badge{background:rgba(124,58,237,.2);border:1px solid var(--accent);border-radius:6px;
+  padding:2px 6px;font-size:10px;color:var(--accent2);font-weight:700}
+.exp-badge{font-size:10px;color:var(--gold);font-weight:700}
+.progress-row{display:flex;align-items:center;gap:8px}
+.blocks{display:flex;gap:3px;flex-wrap:wrap;flex:1}
+.block{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);
+  background:transparent;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.block.done{border:none;box-shadow:0 0 6px rgba(16,185,129,.4)}
+.block.fail{background:rgba(239,68,68,.3);border-color:var(--red)}
+.progress-text{font-size:11px;color:var(--muted);flex-shrink:0}
+.habit-note{font-size:10px;color:var(--muted);margin-top:4px}
+
+.checkin-btn{background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:20px;
+  padding:6px 12px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--body);
+  flex-shrink:0;transition:all .2s;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+.checkin-btn:hover{transform:scale(1.05)}
+.checkin-btn.fail-btn{background:linear-gradient(135deg,var(--red),#dc2626);box-shadow:0 2px 8px rgba(239,68,68,.3)}
+
+.chat-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.chat-header{background:linear-gradient(135deg,var(--surface2),#0d1a3a);padding:12px 16px;
+  display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.chat-messages{height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.msg{display:flex;gap:8px;align-items:flex-end}
+.msg.user{flex-direction:row-reverse}
+.msg-bubble{max-width:80%;padding:8px 12px;border-radius:12px;font-size:12px;line-height:1.5}
+.msg.bot .msg-bubble{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg.user .msg-bubble{background:linear-gradient(135deg,var(--accent),#6d28d9);border-bottom-right-radius:4px}
+.msg-avatar{font-size:18px;flex-shrink:0}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+  padding:8px 14px;color:var(--text);font-size:12px;font-family:var(--body);outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:var(--accent2)}
+.chat-input::placeholder{color:var(--muted)}
+.send-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:20px;
+  padding:8px 14px;color:white;font-size:13px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.send-btn:hover{transform:scale(1.05)}
+
+.mission-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s}
+.mission-card:hover{border-color:var(--gold)}
+.mission-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.mission-name{font-size:13px;font-weight:700}
+.mission-type{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
+.type-skill{background:rgba(6,182,212,.2);color:var(--accent2);border:1px solid rgba(6,182,212,.4)}
+.type-challenge{background:rgba(239,68,68,.2);color:var(--red);border:1px solid rgba(239,68,68,.4)}
+.type-create{background:rgba(139,92,246,.2);color:var(--purple);border:1px solid rgba(139,92,246,.4)}
+.mission-progress{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.mission-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:3px;
+  transition:width .5s;box-shadow:0 0 6px rgba(245,158,11,.5)}
+.mission-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.mission-reward{color:var(--gold);font-weight:700}
+.milestones{margin-top:8px}
+.milestone{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 0;color:var(--muted);cursor:pointer}
+.milestone.done{color:var(--green);text-decoration:line-through}
+
+.settings-group{margin-bottom:20px}
+.settings-group h3{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.setting-label{font-size:13px}
+.setting-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.toggle.on::after{left:23px}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:20px;
+  width:100%;max-width:360px;box-shadow:0 0 40px rgba(124,58,237,.3)}
+.modal h3{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-row{margin-bottom:12px}
+.modal label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+.modal input,.modal select{width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--body);outline:none}
+.modal input:focus,.modal select:focus{border-color:var(--accent2)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.btn-primary{flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
+.btn-primary:hover{transform:scale(1.02)}
+.btn-secondary{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
+.btn-secondary:hover{border-color:var(--accent)}
+
+.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:300;width:calc(100% - 40px);max-width:360px;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--accent2);border-radius:12px;padding:12px 16px;
+  margin-top:8px;font-size:13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 4px 20px rgba(6,182,212,.3);animation:slideUp .3s ease,fadeOut .3s ease 2.7s forwards}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-10px)}}
+
+.levelup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:400;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.levelup-overlay.show{display:flex;animation:flashIn .4s ease}
+@keyframes flashIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.levelup-text{font-family:var(--pixel);font-size:14px;color:var(--gold);text-shadow:0 0 20px rgba(245,158,11,.8);
+  text-align:center;line-height:2;animation:glow 1s infinite alternate;white-space:pre-line}
+@keyframes glow{from{text-shadow:0 0 10px rgba(245,158,11,.5)}to{text-shadow:0 0 30px rgba(245,158,11,1)}}
+
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px}
+.quick-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;
+  font-size:11px;color:var(--text);cursor:pointer;font-family:var(--body);transition:all .2s}
+.quick-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.add-btn{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.2));border:1px dashed var(--accent);
+  border-radius:12px;padding:12px;width:100%;color:var(--accent2);font-size:13px;font-weight:700;
+  cursor:pointer;font-family:var(--body);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-btn:hover{background:rgba(124,58,237,.3)}
+</style>
+</head>
+<body>
+
+<div class="sync-banner syncing" id="syncBanner">
+  <div class="sync-dot"></div>
+  <span id="syncText">連線 Firebase 中...</span>
+</div>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:20px">🎮</span>
+    <div><div class="pixel-title">LIFE RPG</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="player-badge" id="lvBadge">⚡ Lv.1</div>
+    <button style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);cursor:pointer;font-size:14px" onclick="switchTab('settings')">⚙️</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('tracker')" data-tab="tracker">📊 本週追蹤</div>
+  <div class="tab" onclick="switchTab('chat')" data-tab="chat">🐱 助理</div>
+  <div class="tab" onclick="switchTab('missions')" data-tab="missions">🎯 任務</div>
+  <div class="tab" onclick="switchTab('settings')" data-tab="settings">⚙️ 設定</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="levelup-overlay" id="levelupOverlay" onclick="this.classList.remove('show')">
+  <div style="font-size:60px">🎉</div>
+  <div class="levelup-text" id="levelupText">LEVEL UP!</div>
+  <div style="font-size:14px;color:var(--text)" id="levelupSub"></div>
+  <div style="font-size:11px;color:var(--muted);margin-top:20px">點任意處繼續</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>✏️ <span id="modalTitle">新增習慣</span></h3>
+    <div class="modal-row"><label>習慣名稱</label><input type="text" id="modalName" placeholder="例：重訓、英文練習..."></div>
+    <div class="modal-row"><label>週目標次數</label><input type="number" id="modalGoal" min="1" max="7" value="3"></div>
+    <div class="modal-row"><label>分類</label>
+      <select id="modalCat">
+        <option value="運動">💪 運動</option><option value="語言">🗣️ 語言</option>
+        <option value="興趣">🎨 興趣</option><option value="飲食">🥗 飲食</option>
+        <option value="閱讀">📚 閱讀</option><option value="其他">⭐ 其他</option>
+      </select>
+    </div>
+    <div class="modal-row"><label>備註（選填）</label><input type="text" id="modalNote" placeholder="例：每次10分鐘"></div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveHabit()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="page active" id="page-tracker">
+    <div id="trackerLoading" class="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">載入中...</div>
+    </div>
+    <div id="trackerContent" style="display:none">
+      <div class="player-card">
+        <div class="player-row">
+          <div class="avatar">🦸</div>
+          <div class="player-info">
+            <div class="player-name" id="playerName">冒險者</div>
+            <div class="player-title" id="playerTitle">✨ 初心者</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--muted)">週進度</div>
+            <div style="font-size:18px;font-weight:900;color:var(--gold)" id="weekScore">0%</div>
+          </div>
+        </div>
+        <div class="exp-row"><span class="exp-label">EXP</span><span class="exp-val" id="expDisplay">0 / 100</span></div>
+        <div class="exp-bar"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+        <div class="stats-row" id="statsRow"></div>
+      </div>
+      <div class="week-header">
+        <div class="week-label" id="weekLabel">📅 本週</div>
+        <div class="date-label" id="dateLabel"></div>
+      </div>
+      <div id="habitsContainer"></div>
+      <button class="add-btn" onclick="openModal()">➕ 新增習慣</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-chat">
+    <div class="chat-section">
+      <div class="chat-header">
+        <span style="font-size:20px">🐱</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">OpenClaw 助理</div>
+          <div style="font-size:10px;color:var(--muted)">你的人生 RPG 夥伴</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="online-dot"></div><span style="font-size:10px;color:var(--green)">上線中</span>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg bot"><span class="msg-avatar">🐱</span><div class="msg-bubble">喵喵！我是 OpenClaw 🎮✨ 完成了什麼習慣就告訴我，我幫你記錄！</div></div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="告訴我今天完成了什麼..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-btn" onclick="sendMessage()">送出</button>
+      </div>
+    </div>
+    <div class="section-title">快速打卡</div>
+    <div class="quick-btns" id="quickBtns"></div>
+  </div>
+
+  <div class="page" id="page-missions">
+    <div class="section-title">🎯 月度任務</div>
+    <div id="missionsContainer"></div>
+    <button class="add-btn" onclick="addMission()">➕ 新增任務</button>
+    <div class="section-title" style="margin-top:20px">📊 技能樹</div>
+    <div id="skillsContainer"></div>
+  </div>
+
+  <div class="page" id="page-settings">
+    <div class="settings-group">
+      <h3>☁️ Firebase 同步</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">同步狀態</div><div class="setting-sub" id="syncStatusText">連線中...</div></div>
+        <button class="btn-primary" style="padding:6px 12px;font-size:11px;flex:0" onclick="forceSave()">立即同步</button>
+      </div>
+      <div style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:10px;padding:10px;margin-top:8px;font-size:11px;color:var(--muted);line-height:1.6">
+        💡 資料存在 Firebase Firestore（專案：claude-e5a82），任何設備用瀏覽器開啟這個 HTML 都能同步。
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3>👤 玩家設定</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">玩家名稱</div><div class="setting-sub" id="settingNameSub">冒險者</div></div>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:11px" onclick="changeName()">修改</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3>⏰ 提醒設定</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">中午提醒 (13:00)</div><div class="setting-sub">每天確認習慣進度</div></div>
+        <button class="toggle on" id="toggle-noon" onclick="toggleSetting(this)"></button>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">睡前提醒 (23:00)</div><div class="setting-sub">睡前打卡確認</div></div>
+        <button class="toggle on" id="toggle-night" onclick="toggleSetting(this)"></button>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">瀏覽器通知</div><div class="setting-sub" id="notifStatus">點擊啟用推播</div></div>
+        <button class="btn-primary" style="padding:6px 12px;font-size:11px;flex:0" onclick="requestNotif()">啟用</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3>📋 習慣管理</h3>
+      <div id="habitManageList"></div>
+      <button class="add-btn" onclick="openModal()" style="margin-top:8px">➕ 新增習慣</button>
+    </div>
+    <div class="settings-group">
+      <h3>🗄️ 資料</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">重置本週</div><div class="setting-sub">清除本週打卡（歷史保留）</div></div>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:11px;color:var(--red);border-color:rgba(239,68,68,.4)" onclick="resetWeek()">重置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyCtvgwpmUqcmf5q6okIO84D_m_TfYCiA6Y",
+  authDomain: "claude-e5a82.firebaseapp.com",
+  projectId: "claude-e5a82",
+  storageBucket: "claude-e5a82.firebasestorage.app",
+  messagingSenderId: "166417271324",
+  appId: "1:166417271324:web:99ad693c783d6326d6add9"
+});
+
+const db = getFirestore(app);
+const REF = doc(db, 'rpg', 'main');
+
+window._fbLoad = async () => {
+  const snap = await getDoc(REF);
+  return snap.exists() ? snap.data() : null;
+};
+window._fbSave = async (data) => { await setDoc(REF, data); };
+window._fbReady = true;
+window.dispatchEvent(new Event('fbReady'));
+</script>
+
+<script>
+const DEFAULT = {
+  playerName:'冒險者',level:1,totalExp:30,
+  weekStart:getMonday().toISOString(),
+  habits:[
+    {id:1,name:'重訓',cat:'運動',goal:3,note:'',count:1,failed:false},
+    {id:2,name:'有氧',cat:'運動',goal:3,note:'',count:2,failed:false},
+    {id:3,name:'英文發音練習',cat:'語言',goal:3,note:'每次10分鐘',count:0,failed:false},
+    {id:4,name:'Mock Interview',cat:'語言',goal:3,note:'每次10分鐘',count:0,failed:false},
+    {id:5,name:'日文檢定準備',cat:'語言',goal:2,note:'每次30分鐘',count:0,failed:false},
+    {id:6,name:'唱歌',cat:'興趣',goal:1,note:'',count:1,failed:false},
+    {id:7,name:'跳舞',cat:'興趣',goal:1,note:'',count:0,failed:false},
+    {id:8,name:'戒糖',cat:'飲食',goal:7,note:'每天都要！',count:0,failed:true},
+    {id:9,name:'自己煮菜',cat:'飲食',goal:3,note:'',count:0,failed:false},
+    {id:10,name:'閱讀',cat:'閱讀',goal:2,note:'原子習慣',count:2,failed:false},
+  ],
+  missions:[
+    {id:1,name:'英文面試準備',type:'skill',goal:'準備好一版流利的英文面試內容',reward:125,
+      milestones:['完成英文自我介紹草稿','練習至流利程度','完成面試QA準備'],done:[false,false,false]},
+    {id:2,name:'減重挑戰',type:'challenge',goal:'83kg → 81kg',reward:150,
+      milestones:['降至82.5kg','降至82kg','達成81kg 🎯'],done:[false,false,false]},
+    {id:3,name:'文章創作',type:'create',goal:'至少寫好三篇文章並發布',reward:100,
+      milestones:['完成第一篇文章','完成第二篇文章','完成第三篇文章'],done:[false,false,false]},
+  ],
+  records:[],reminders:{noon:true,night:true}
+};
+
+const CAT={
+  '運動':{icon:'💪',color:'#10b981',label:'體能系'},
+  '語言':{icon:'🗣️',color:'#06b6d4',label:'語言系'},
+  '興趣':{icon:'🎨',color:'#f59e0b',label:'藝能系'},
+  '飲食':{icon:'🥗',color:'#f97316',label:'養生系'},
+  '閱讀':{icon:'📚',color:'#8b5cf6',label:'智慧系'},
+  '其他':{icon:'⭐',color:'#64748b',label:'其他'},
+};
+
+const EXP=10, EXPNEXT=lv=>lv*100;
+let S=null, saveTimer=null;
+
+function getMonday(){
+  const d=new Date(); d.setHours(0,0,0,0);
+  const day=d.getDay(); d.setDate(d.getDate()-day+(day===0?-6:1));
+  return d;
+}
+function getWeekNum(){
+  const d=new Date(),j=new Date(d.getFullYear(),0,1);
+  return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);
+}
+
+function setSyncUI(status,msg){
+  const b=document.getElementById('syncBanner');
+  b.className='sync-banner '+status;
+  document.getElementById('syncText').textContent=msg;
+  const s=document.getElementById('syncStatusText');
+  if(s) s.textContent=msg;
+}
+
+async function loadData(){
+  setSyncUI('syncing','☁️ 載入 Firebase 資料...');
+  try{
+    const data=await window._fbLoad();
+    if(data){
+      S=data;
+      const stored=new Date(S.weekStart), curr=getMonday();
+      if(stored.toDateString()!==curr.toDateString()){
+        S.habits.forEach(h=>{h.count=0;h.failed=false;});
+        S.weekStart=curr.toISOString();
+        await saveData();
+      }
+    } else {
+      S=JSON.parse(JSON.stringify(DEFAULT));
+      S.weekStart=getMonday().toISOString();
+      await saveData();
+    }
+    setSyncUI('ok','✅ Firebase 已連線 · 跨設備同步中');
+  } catch(e){
+    S=JSON.parse(JSON.stringify(DEFAULT));
+    setSyncUI('error','⚠️ 連線失敗：'+e.message);
+    console.error(e);
+  }
+}
+
+async function saveData(){
+  setSyncUI('syncing','💾 同步中...');
+  try{
+    await window._fbSave(S);
+    setSyncUI('ok','✅ 已同步 · '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e){
+    setSyncUI('error','⚠️ 同步失敗：'+e.message);
+    console.error(e);
+  }
+}
+
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,800);}
+async function forceSave(){await saveData();showToast('☁️ 強制同步完成！');}
+
+function renderTracker(){
+  document.getElementById('weekLabel').textContent=`📅 第 ${getWeekNum()} 週習慣追蹤`;
+  document.getElementById('dateLabel').textContent=new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'long'});
+  updateCard();
+  const cats={};
+  S.habits.forEach(h=>{if(!cats[h.cat])cats[h.cat]=[];cats[h.cat].push(h);});
+  const c=document.getElementById('habitsContainer'); c.innerHTML='';
+  Object.entries(cats).forEach(([cat,habits])=>{
+    const cfg=CAT[cat]||CAT['其他'];
+    const div=document.createElement('div'); div.className='category';
+    div.innerHTML=`<div class="cat-header"><span class="cat-icon">${cfg.icon}</span><span class="cat-name" style="color:${cfg.color}">${cat}</span></div>`;
+    habits.forEach(h=>div.appendChild(buildHabitEl(h)));
+    c.appendChild(div);
+  });
+  renderQuickBtns(); renderHabitManage();
+}
+
+function buildHabitEl(h){
+  const cfg=CAT[h.cat]||CAT['其他'];
+  let blocks='';
+  for(let i=0;i<h.goal;i++){
+    if(h.name==='戒糖'&&h.failed&&i===0) blocks+=`<div class="block fail">❌</div>`;
+    else if(i<h.count) blocks+=`<div class="block done" style="background:${cfg.color}85">✓</div>`;
+    else blocks+=`<div class="block"></div>`;
+  }
+  const el=document.createElement('div');
+  el.className='habit-item'+(h.failed?' failed':'');
+  el.innerHTML=`
+    <div class="habit-top">
+      <div class="habit-name">${h.name} ${h.count>=h.goal?'✅':''}</div>
+      <div class="habit-meta"><span class="lv-badge">Lv.${h.count}</span><span class="exp-badge">⚡${h.count*EXP}</span></div>
+    </div>
+    <div class="progress-row">
+      <div class="blocks">${blocks}</div>
+      <span class="progress-text">${h.count}/${h.goal}</span>
+      ${h.name==='戒糖'
+        ?`<button class="checkin-btn fail-btn" onclick="markFail(${h.id},event)">紅框</button><button class="checkin-btn" onclick="checkin(${h.id},event)">達標</button>`
+        :`<button class="checkin-btn" onclick="checkin(${h.id},event)">+1</button>`}
+    </div>
+    ${h.note?`<div class="habit-note">⏱ ${h.note}</div>`:''}`;
+  return el;
+}
+
+function updateCard(){
+  const need=EXPNEXT(S.level), cur=S.totalExp%need;
+  document.getElementById('expFill').style.width=Math.min(cur/need*100,100)+'%';
+  document.getElementById('expDisplay').textContent=`${cur} / ${need} EXP → Lv.${S.level+1}`;
+  document.getElementById('lvBadge').textContent=`⚡ Lv.${S.level}`;
+  document.getElementById('playerName').textContent=S.playerName;
+  document.getElementById('settingNameSub').textContent=S.playerName;
+  const titles=['初心者','覺醒者','修行者','強者','英雄','傳奇','神話'];
+  document.getElementById('playerTitle').textContent='✨ '+(titles[S.level-1]||'神話');
+  const done=S.habits.filter(h=>h.count>=h.goal).length;
+  document.getElementById('weekScore').textContent=S.habits.length?Math.round(done/S.habits.length*100)+'%':'0%';
+  document.getElementById('statsRow').innerHTML=Object.entries(CAT).map(([cat,cfg])=>{
+    if(!S.habits.some(h=>h.cat===cat)) return '';
+    const exp=S.habits.filter(h=>h.cat===cat).reduce((s,h)=>s+h.count*EXP,0);
+    return `<div class="stat-chip" style="border-color:${cfg.color}30;color:${cfg.color}">${cfg.icon} ${exp} EXP</div>`;
+  }).join('');
+}
+
+function renderMissions(){
+  const tm={skill:['type-skill','技能'],challenge:['type-challenge','挑戰'],create:['type-create','創作']};
+  document.getElementById('missionsContainer').innerHTML=S.missions.map(m=>{
+    const [cls,lbl]=tm[m.type]||['type-skill','其他'];
+    const pct=m.milestones.length?m.done.filter(Boolean).length/m.milestones.length*100:0;
+    const miles=m.milestones.map((ms,i)=>`<div class="milestone ${m.done[i]?'done':''}" onclick="toggleMilestone(${m.id},${i})"><span>${m.done[i]?'✅':'☐'}</span> <span>${ms}</span></div>`).join('');
+    return `<div class="mission-card">
+      <div class="mission-top"><div class="mission-name">${m.name}</div><div class="mission-type ${cls}">${lbl}</div></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${m.goal}</div>
+      <div class="mission-progress"><div class="mission-fill" style="width:${pct}%"></div></div>
+      <div class="mission-meta"><span>${Math.round(pct)}% 完成</span><span class="mission-reward">🏆 ${m.reward} EXP</span></div>
+      <div class="milestones">${miles}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('skillsContainer').innerHTML=Object.entries(CAT).map(([cat,cfg])=>{
+    const habits=S.habits.filter(h=>h.cat===cat); if(!habits.length) return '';
+    const exp=habits.reduce((s,h)=>s+h.count*EXP,0);
+    const lv=Math.floor(exp/50)+1,pct=(exp%50)/50*100;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:700;color:${cfg.color}">${cfg.icon} ${cfg.label}</span>
+        <span style="font-size:11px;color:var(--muted)">Lv.${lv} · ${exp} EXP</span>
+      </div>
+      <div class="exp-bar"><div class="exp-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderQuickBtns(){
+  document.getElementById('quickBtns').innerHTML=S.habits.slice(0,8).map(h=>
+    `<button class="quick-btn" onclick="quickCheckin(${h.id})">${h.name} ✓</button>`).join('');
+}
+function renderHabitManage(){
+  document.getElementById('habitManageList').innerHTML=S.habits.map(h=>`
+    <div class="setting-row">
+      <div><div class="setting-label">${CAT[h.cat]?.icon||'⭐'} ${h.name}</div><div class="setting-sub">目標：${h.goal}次/週 · 完成：${h.count}次</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-secondary" style="padding:4px 8px;font-size:10px" onclick="openModal(${h.id})">編輯</button>
+        <button class="btn-secondary" style="padding:4px 8px;font-size:10px;color:var(--red);border-color:rgba(239,68,68,.4)" onclick="deleteHabit(${h.id})">刪除</button>
+      </div>
+    </div>`).join('');
+}
+
+function checkin(id,e){
+  e&&e.stopPropagation();
+  const h=S.habits.find(x=>x.id===id); if(!h) return;
+  h.count++;h.failed=false;S.totalExp+=EXP;
+  S.records.push({date:new Date().toISOString(),habitId:id,habitName:h.name,action:'checkin'});
+  if(S.totalExp>=S.level*EXPNEXT(S.level)){S.level++;showLevelUp(S.level);}
+  scheduleSave();renderTracker();
+  showToast(`✅ ${h.name} +1  ⚡+${EXP} EXP`);
+  if(h.count>=h.goal) addBotMsg(`🎉 ${h.name}本週目標達成！太棒了！+${EXP} EXP ✅`);
+  else addBotMsg(`收到！${h.name} ${h.count}/${h.goal} 🟩 +${EXP} EXP 繼續加油！🐱`);
+}
+function markFail(id,e){
+  e&&e.stopPropagation();
+  const h=S.habits.find(x=>x.id===id); if(!h) return;
+  h.failed=true;
+  S.records.push({date:new Date().toISOString(),habitId:id,habitName:h.name,action:'fail'});
+  scheduleSave();renderTracker();
+  showToast(`❌ ${h.name} 今天紅框`);
+  addBotMsg(`${h.name} 今日紅框已記錄 ❌ 決不連續失敗兩次，明天一定行！🐱💪`);
+}
+function quickCheckin(id){checkin(id,null);switchTab('chat');}
+function toggleMilestone(mId,idx){
+  const m=S.missions.find(x=>x.id===mId); if(!m) return;
+  m.done[idx]=!m.done[idx];
+  if(m.done.every(Boolean)){
+    S.totalExp+=m.reward;
+    showToast(`🏆 任務完成！+${m.reward} EXP`);
+    addBotMsg(`🎊 任務「${m.name}」全數完成！+${m.reward} EXP 🏆 你超強的！🐱`);
+  }
+  scheduleSave();renderMissions();
+}
+
+function addBotMsg(t){
+  const c=document.getElementById('chatMessages');
+  c.innerHTML+=`<div class="msg bot"><span class="msg-avatar">🐱</span><div class="msg-bubble">${t}</div></div>`;
+  c.scrollTop=c.scrollHeight;
+}
+function addUserMsg(t){
+  const c=document.getElementById('chatMessages');
+  c.innerHTML+=`<div class="msg user"><span class="msg-avatar">👤</span><div class="msg-bubble">${t}</div></div>`;
+  c.scrollTop=c.scrollHeight;
+}
+function sendMessage(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim(); if(!text) return;
+  inp.value=''; addUserMsg(text); processChat(text);
+}
+async function processChat(text){
+  const summary=S.habits.map(h=>`${h.name}:${h.count}/${h.goal}`).join(',');
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:150,
+        system:`你是 OpenClaw，熱情有趣的人生RPG習慣助理🐱。繁體中文、簡短有力（60字內）、多用emoji。
+玩家：${S.playerName} Lv.${S.level} ${S.totalExp}EXP
+本週進度：${summary}
+習慣：${S.habits.map(h=>h.name).join('、')}
+提到完成習慣→說已記錄+10EXP並鼓勵；提到失敗/吃糖→說紅框已記錄鼓勵明天`,
+        messages:[{role:"user",content:text}]
+      })
+    });
+    const data=await res.json();
+    const reply=data.content?.map(b=>b.text||'').join('');
+    if(reply){autoDetectCheckin(text);addBotMsg(reply);return;}
+  } catch(e){}
+  if(text.includes('戒糖')&&/失敗|吃了|沒戒/.test(text)){
+    const h=S.habits.find(x=>x.name==='戒糖');
+    if(h)h.failed=true;scheduleSave();renderTracker();
+    addBotMsg('戒糖紅框已記錄 ❌ 明天重新開始！🐱');return;
+  }
+  const matched=autoDetectCheckin(text);
+  if(matched.length){addBotMsg(`已記錄：${matched.join('、')} ✅ +${matched.length*EXP} EXP！🔥🐱`);return;}
+  const fb=['有什麼習慣完成了嗎？告訴我！⚡🐱','加油！每個行動都在累積EXP！💪🐱','說說今天進度～🎮🐱'];
+  addBotMsg(fb[Math.floor(Math.random()*fb.length)]);
+}
+function autoDetectCheckin(text){
+  const matched=[];
+  S.habits.forEach(h=>{
+    if(text.includes(h.name)&&/完成|做了|跑|練|讀|看|上了|去了/.test(text)){
+      h.count++;S.totalExp+=EXP;
+      S.records.push({date:new Date().toISOString(),habitId:h.id,habitName:h.name,action:'chat'});
+      matched.push(h.name);
+    }
+  });
+  if(matched.length){scheduleSave();renderTracker();}
+  return matched;
+}
+
+let editId=null;
+function openModal(id){
+  editId=id||null;
+  if(id){
+    const h=S.habits.find(x=>x.id===id);
+    document.getElementById('modalTitle').textContent='編輯習慣';
+    document.getElementById('modalName').value=h.name;
+    document.getElementById('modalGoal').value=h.goal;
+    document.getElementById('modalCat').value=h.cat;
+    document.getElementById('modalNote').value=h.note||'';
+  } else {
+    document.getElementById('modalTitle').textContent='新增習慣';
+    ['modalName','modalNote'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('modalGoal').value=3;
+  }
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+function saveHabit(){
+  const name=document.getElementById('modalName').value.trim();
+  const goal=parseInt(document.getElementById('modalGoal').value);
+  if(!name||!goal) return;
+  const cat=document.getElementById('modalCat').value,note=document.getElementById('modalNote').value.trim();
+  if(editId){const h=S.habits.find(x=>x.id===editId);Object.assign(h,{name,goal,cat,note});}
+  else S.habits.push({id:Date.now(),name,cat,goal,note,count:0,failed:false});
+  scheduleSave();closeModal();renderTracker();renderMissions();
+  showToast(`✅ 習慣已${editId?'更新':'新增'}：${name}`);
+}
+function addMission(){
+  const name=prompt('任務名稱：'); if(!name) return;
+  const goal=prompt('目標描述：',name)||name;
+  S.missions.push({id:Date.now(),name,type:'skill',goal,reward:100,milestones:[goal],done:[false]});
+  scheduleSave();renderMissions();showToast('🎯 新任務已加入！');
+}
+function deleteHabit(id){
+  if(!confirm('確定要刪除？')) return;
+  S.habits=S.habits.filter(h=>h.id!==id);
+  scheduleSave();renderTracker();renderMissions();
+}
+
+function toggleSetting(btn){
+  btn.classList.toggle('on');
+  if(btn.id==='toggle-noon')S.reminders.noon=btn.classList.contains('on');
+  if(btn.id==='toggle-night')S.reminders.night=btn.classList.contains('on');
+  scheduleSave();
+}
+function changeName(){
+  const n=prompt('玩家名稱：',S.playerName);
+  if(n&&n.trim()){S.playerName=n.trim();scheduleSave();renderTracker();}
+}
+function resetWeek(){
+  if(!confirm('確定重置本週？')) return;
+  S.habits.forEach(h=>{h.count=0;h.failed=false;});
+  S.weekStart=getMonday().toISOString();scheduleSave();renderTracker();
+  showToast('🔄 本週已重置！');
+}
+function requestNotif(){
+  if(!('Notification' in window)){document.getElementById('notifStatus').textContent='不支援通知';return;}
+  Notification.requestPermission().then(p=>{
+    document.getElementById('notifStatus').textContent=p==='granted'?'✅ 已啟用':'❌ 被拒絕';
+    if(p==='granted') startReminders();
+  });
+}
+function startReminders(){
+  setInterval(()=>{
+    const n=new Date(),hm=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    if(S.reminders.noon&&hm==='13:00'){
+      if(Notification.permission==='granted') new Notification('🌞 中午提醒',{body:'確認今天的習慣進度吧！🐱'});
+      addBotMsg('🌞 中午提醒：今天完成了什麼？告訴我！🐱');
+    }
+    if(S.reminders.night&&hm==='23:00'){
+      if(Notification.permission==='granted') new Notification('🌙 睡前提醒',{body:'習慣都更新了嗎？🐱'});
+      addBotMsg('🌙 睡前提醒：快確認今天的打卡再去睡！🐱');
+    }
+  },60000);
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`page-${tab}`)?.classList.add('active');
+  if(tab==='missions')renderMissions();
+  if(tab==='tracker')renderTracker();
+}
+function showToast(msg){
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(()=>t.remove(),3100);
+}
+function showLevelUp(lv){
+  const titles=['','初心者','覺醒者','修行者','強者','英雄','傳奇','神話'];
+  document.getElementById('levelupText').textContent=`LEVEL UP!\nLv.${lv}  ${titles[lv]||'神話'}`;
+  document.getElementById('levelupSub').textContent=`✨ 解鎖稱號：${titles[lv]||'神話'} ✨`;
+  document.getElementById('levelupOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('levelupOverlay').classList.remove('show'),4000);
+}
+
+async function init(){
+  if(!window._fbReady){
+    await new Promise(r=>window.addEventListener('fbReady',r,{once:true}));
+  }
+  await loadData();
+  document.getElementById('trackerLoading').style.display='none';
+  document.getElementById('trackerContent').style.display='block';
+  renderTracker();
+  if(!S.reminders.noon) document.getElementById('toggle-noon').classList.remove('on');
+  if(!S.reminders.night) document.getElementById('toggle-night').classList.remove('on');
+  startReminders();
+  addBotMsg(`喵喵！歡迎回來 ${S.playerName} 🎮 Lv.${S.level}，繼續今天的冒險！💪🐱`);
+}
+init();
+</script>
+</body>
+</html>
