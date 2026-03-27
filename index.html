@@ -6,21 +6,10 @@
 <title>🎮 人生 RPG</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0d0d1a;--surface:#141428;--surface2:#1a1a35;--border:#2a2a55;
-  --accent:#7c3aed;--accent2:#06b6d4;--gold:#f59e0b;--green:#10b981;
-  --red:#ef4444;--orange:#f97316;--purple:#8b5cf6;--text:#e2e8f0;--muted:#64748b;
-  --pixel:'Press Start 2P',monospace;--body:'Noto Sans TC',sans-serif;
-}
+:root{--bg:#0d0d1a;--surface:#141428;--surface2:#1a1a35;--border:#2a2a55;--accent:#7c3aed;--accent2:#06b6d4;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--orange:#f97316;--purple:#8b5cf6;--text:#e2e8f0;--muted:#64748b;--pixel:'Press Start 2P',monospace;--body:'Noto Sans TC',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.4) 0%,transparent 100%),
-    radial-gradient(1px 1px at 75% 15%,rgba(255,255,255,.3) 0%,transparent 100%),
-    radial-gradient(1px 1px at 45% 65%,rgba(255,255,255,.35) 0%,transparent 100%),
-    radial-gradient(1px 1px at 88% 55%,rgba(255,255,255,.25) 0%,transparent 100%),
-    radial-gradient(1px 1px at 30% 80%,rgba(255,255,255,.3) 0%,transparent 100%)}
-
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 75% 15%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 45% 65%,rgba(255,255,255,.35) 0%,transparent 100%),radial-gradient(1px 1px at 88% 55%,rgba(255,255,255,.25) 0%,transparent 100%),radial-gradient(1px 1px at 30% 80%,rgba(255,255,255,.3) 0%,transparent 100%)}
 .sync-banner{padding:6px 16px;font-size:11px;display:flex;align-items:center;gap:6px;justify-content:center;border-bottom:1px solid transparent;transition:all .3s}
 .sync-banner.ok{background:linear-gradient(90deg,rgba(16,185,129,.15),rgba(6,182,212,.15));border-color:rgba(16,185,129,.3);color:var(--green)}
 .sync-banner.syncing{background:linear-gradient(90deg,rgba(245,158,11,.1),rgba(245,158,11,.05));border-color:rgba(245,158,11,.3);color:var(--gold)}
@@ -28,37 +17,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .sync-dot{width:6px;height:6px;background:currentColor;border-radius:50%;box-shadow:0 0 6px currentColor;animation:pulse 2s infinite}
 .sync-banner.error .sync-dot{animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-.header{background:linear-gradient(135deg,#1a0a3d,#0d1a3a);border-bottom:2px solid var(--accent);
-  padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 4px 30px rgba(124,58,237,.3)}
+.header{background:linear-gradient(135deg,#1a0a3d,#0d1a3a);border-bottom:2px solid var(--accent);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 30px rgba(124,58,237,.3)}
 .pixel-title{font-family:var(--pixel);font-size:9px;color:var(--gold);text-shadow:0 0 10px rgba(245,158,11,.8)}
 .player-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
-
-.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:56px;z-index:99}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:56px;z-index:99}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;padding:12px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
-  border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.tab{flex:0 0 auto;padding:12px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
 .tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
 .tab:hover:not(.active){color:var(--text)}
-
 .content{padding:16px;max-width:600px;margin:0 auto;position:relative;z-index:1}
 .page{display:none}.page.active{display:block}
-
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
 .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-family:var(--pixel);font-size:8px;color:var(--muted)}
-
-.player-card{background:linear-gradient(135deg,#1a0a3d,#0a1f3d);border:1px solid var(--accent);
-  border-radius:16px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}
-.player-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;
-  background:radial-gradient(circle,rgba(124,58,237,.3),transparent 70%);border-radius:50%}
+.player-card{background:linear-gradient(135deg,#1a0a3d,#0a1f3d);border:1px solid var(--accent);border-radius:16px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}
+.player-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(124,58,237,.3),transparent 70%);border-radius:50%}
 .player-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.avatar{width:50px;height:50px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;
-  flex-shrink:0;box-shadow:0 0 20px rgba(124,58,237,.4)}
+.avatar{width:50px;height:50px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 0 20px rgba(124,58,237,.4)}
 .player-info{flex:1}
 .player-name{font-size:16px;font-weight:900}
 .player-title{font-size:11px;color:var(--gold);margin-top:2px}
@@ -66,48 +42,45 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .exp-label{font-size:11px;color:var(--muted)}
 .exp-val{font-size:11px;color:var(--accent2);font-weight:700}
 .exp-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
-.exp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
-  border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px rgba(6,182,212,.6)}
+.exp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px rgba(6,182,212,.6)}
 .stats-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.stat-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;
-  padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
-
+.stat-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
 .week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .week-label{font-size:13px;font-weight:700;color:var(--gold)}
 .date-label{font-size:11px;color:var(--muted)}
-
 .category{margin-bottom:20px}
 .cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .cat-icon{font-size:16px}.cat-name{font-size:13px;font-weight:700}
-
-.habit-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:12px;margin-bottom:8px;transition:all .2s}
+.habit-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;transition:all .2s}
 .habit-item:hover{border-color:var(--accent);transform:translateY(-1px)}
-.habit-item.failed{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
+.habit-item.partial-fail{border-color:rgba(239,68,68,.3)}
 .habit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .habit-name{font-size:13px;font-weight:700}
 .habit-meta{display:flex;align-items:center;gap:6px}
-.lv-badge{background:rgba(124,58,237,.2);border:1px solid var(--accent);border-radius:6px;
-  padding:2px 6px;font-size:10px;color:var(--accent2);font-weight:700}
+.lv-badge{background:rgba(124,58,237,.2);border:1px solid var(--accent);border-radius:6px;padding:2px 6px;font-size:10px;color:var(--accent2);font-weight:700}
 .exp-badge{font-size:10px;color:var(--gold);font-weight:700}
-.progress-row{display:flex;align-items:center;gap:8px}
+.progress-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .blocks{display:flex;gap:3px;flex-wrap:wrap;flex:1}
-.block{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);
-  background:transparent;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.block{width:20px;height:20px;border-radius:4px;border:1px solid var(--border);background:transparent;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;user-select:none}
+.block:hover{border-color:var(--accent2);transform:scale(1.1)}
 .block.done{border:none;box-shadow:0 0 6px rgba(16,185,129,.4)}
-.block.fail{background:rgba(239,68,68,.3);border-color:var(--red)}
+.block.fail-mark{background:rgba(239,68,68,.2);border-color:var(--red)}
+.block.empty{}
 .progress-text{font-size:11px;color:var(--muted);flex-shrink:0}
 .habit-note{font-size:10px;color:var(--muted);margin-top:4px}
-
-.checkin-btn{background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:20px;
-  padding:6px 12px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--body);
-  flex-shrink:0;transition:all .2s;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+.habit-log{margin-top:6px;display:flex;flex-direction:column;gap:2px}
+.log-entry{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;padding:2px 0}
+.log-time{color:var(--muted);opacity:.7;font-size:9px}
+.btn-row{display:flex;gap:6px;flex-shrink:0}
+.checkin-btn{background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:20px;padding:6px 10px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s;box-shadow:0 2px 8px rgba(16,185,129,.3)}
 .checkin-btn:hover{transform:scale(1.05)}
 .checkin-btn.fail-btn{background:linear-gradient(135deg,var(--red),#dc2626);box-shadow:0 2px 8px rgba(239,68,68,.3)}
+.checkin-btn.undo-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);box-shadow:none;font-size:10px;padding:5px 8px}
+.checkin-btn.undo-btn:hover{border-color:var(--accent);color:var(--text)}
 
+/* CHAT */
 .chat-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
-.chat-header{background:linear-gradient(135deg,var(--surface2),#0d1a3a);padding:12px 16px;
-  display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.chat-header{background:linear-gradient(135deg,var(--surface2),#0d1a3a);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
 .online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
 .chat-messages{height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
 .chat-messages::-webkit-scrollbar{width:4px}
@@ -119,31 +92,58 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .msg.user .msg-bubble{background:linear-gradient(135deg,var(--accent),#6d28d9);border-bottom-right-radius:4px}
 .msg-avatar{font-size:18px;flex-shrink:0}
 .chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
-.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:20px;
-  padding:8px 14px;color:var(--text);font-size:12px;font-family:var(--body);outline:none;transition:border-color .2s}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--text);font-size:12px;font-family:var(--body);outline:none;transition:border-color .2s}
 .chat-input:focus{border-color:var(--accent2)}
 .chat-input::placeholder{color:var(--muted)}
-.send-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:20px;
-  padding:8px 14px;color:white;font-size:13px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.send-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:20px;padding:8px 14px;color:white;font-size:13px;cursor:pointer;transition:all .2s;flex-shrink:0}
 .send-btn:hover{transform:scale(1.05)}
 
-.mission-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s}
-.mission-card:hover{border-color:var(--gold)}
-.mission-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+/* MISSIONS */
+.mission-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s;cursor:pointer}
+.mission-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.mission-card.completed{border-color:rgba(16,185,129,.5);background:rgba(16,185,129,.05)}
+.mission-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
 .mission-name{font-size:13px;font-weight:700}
 .mission-type{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
 .type-skill{background:rgba(6,182,212,.2);color:var(--accent2);border:1px solid rgba(6,182,212,.4)}
 .type-challenge{background:rgba(239,68,68,.2);color:var(--red);border:1px solid rgba(239,68,68,.4)}
 .type-create{background:rgba(139,92,246,.2);color:var(--purple);border:1px solid rgba(139,92,246,.4)}
+.type-explore{background:rgba(245,158,11,.2);color:var(--gold);border:1px solid rgba(245,158,11,.4)}
 .mission-progress{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:6px}
-.mission-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:3px;
-  transition:width .5s;box-shadow:0 0 6px rgba(245,158,11,.5)}
+.mission-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:3px;transition:width .5s;box-shadow:0 0 6px rgba(245,158,11,.5)}
 .mission-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
 .mission-reward{color:var(--gold);font-weight:700}
-.milestones{margin-top:8px}
-.milestone{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 0;color:var(--muted);cursor:pointer}
-.milestone.done{color:var(--green);text-decoration:line-through}
+.milestones{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.milestone{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 8px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--surface2)}
+.milestone:hover{border-color:var(--accent2)}
+.milestone.done{color:var(--green);background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3)}
+.milestone-icon{font-size:14px;flex-shrink:0}
+.milestone-text{flex:1}
+.milestone-exp{font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0}
+.reward-preview{margin-top:10px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(124,58,237,.1));border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px}
+.reward-title{color:var(--gold);font-weight:700;margin-bottom:4px}
+.reward-items{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.reward-item{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px}
 
+/* SKILLS */
+.skill-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s;overflow:hidden;position:relative}
+.skill-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.skill-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.skill-icon-big{font-size:28px;flex-shrink:0}
+.skill-title{font-size:14px;font-weight:900}
+.skill-subtitle{font-size:11px;color:var(--muted);margin-top:1px}
+.skill-lv{font-family:var(--pixel);font-size:8px;color:var(--gold);margin-top:2px}
+.skill-desc{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:10px;border-left:2px solid var(--accent);padding-left:8px}
+.skill-meme{font-size:11px;color:var(--accent2);font-style:italic;margin-bottom:8px;opacity:.85}
+.skill-unlocks{display:flex;flex-wrap:wrap;gap:6px}
+.skill-unlock{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--purple)}
+.skill-unlock.locked{opacity:.4;filter:grayscale(1)}
+.skill-exp-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px}
+.skill-exp-fill{height:100%;border-radius:3px;transition:width .5s}
+.surprise-badge{position:absolute;top:10px;right:10px;font-size:18px;animation:wobble 2s infinite}
+@keyframes wobble{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+
+/* SETTINGS */
 .settings-group{margin-bottom:20px}
 .settings-group h3{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -154,49 +154,46 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .toggle.on::after{left:23px}
 
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:20px;
-  width:100%;max-width:360px;box-shadow:0 0 40px rgba(124,58,237,.3)}
+.modal{background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:20px;width:100%;max-width:380px;box-shadow:0 0 40px rgba(124,58,237,.3);max-height:90vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .modal-row{margin-bottom:12px}
 .modal label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
-.modal input,.modal select{width:100%;background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--body);outline:none}
-.modal input:focus,.modal select:focus{border-color:var(--accent2)}
+.modal input,.modal select,.modal textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--body);outline:none}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent2)}
+.modal textarea{resize:vertical;min-height:60px}
 .modal-btns{display:flex;gap:8px;margin-top:16px}
-.btn-primary{flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
+.btn-primary{flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
 .btn-primary:hover{transform:scale(1.02)}
-.btn-secondary{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
+.btn-secondary{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s}
 .btn-secondary:hover{border-color:var(--accent)}
 
-.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  z-index:300;width:calc(100% - 40px);max-width:360px;pointer-events:none}
-.toast{background:var(--surface);border:1px solid var(--accent2);border-radius:12px;padding:12px 16px;
-  margin-top:8px;font-size:13px;display:flex;align-items:center;gap:10px;
-  box-shadow:0 4px 20px rgba(6,182,212,.3);animation:slideUp .3s ease,fadeOut .3s ease 2.7s forwards}
+/* TOAST */
+.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:300;width:calc(100% - 40px);max-width:360px;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--accent2);border-radius:12px;padding:12px 16px;margin-top:8px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(6,182,212,.3);animation:slideUp .3s ease,fadeOut .3s ease 2.7s forwards}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes fadeOut{to{opacity:0;transform:translateY(-10px)}}
 
-.levelup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:400;display:none;
-  align-items:center;justify-content:center;flex-direction:column;gap:12px}
+/* LEVEL UP */
+.levelup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:20px;text-align:center}
 .levelup-overlay.show{display:flex;animation:flashIn .4s ease}
 @keyframes flashIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
-.levelup-text{font-family:var(--pixel);font-size:14px;color:var(--gold);text-shadow:0 0 20px rgba(245,158,11,.8);
-  text-align:center;line-height:2;animation:glow 1s infinite alternate;white-space:pre-line}
+.levelup-text{font-family:var(--pixel);font-size:13px;color:var(--gold);text-shadow:0 0 20px rgba(245,158,11,.8);line-height:2;animation:glow 1s infinite alternate;white-space:pre-line}
 @keyframes glow{from{text-shadow:0 0 10px rgba(245,158,11,.5)}to{text-shadow:0 0 30px rgba(245,158,11,1)}}
+.levelup-reward{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(124,58,237,.15));border:1px solid rgba(245,158,11,.4);border-radius:12px;padding:12px 16px;margin-top:8px;font-size:13px;line-height:1.8;max-width:300px}
 
+/* MISC */
 .section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px}
 .quick-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;
-  font-size:11px;color:var(--text);cursor:pointer;font-family:var(--body);transition:all .2s}
+.quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:11px;color:var(--text);cursor:pointer;font-family:var(--body);transition:all .2s}
 .quick-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.add-btn{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.2));border:1px dashed var(--accent);
-  border-radius:12px;padding:12px;width:100%;color:var(--accent2);font-size:13px;font-weight:700;
-  cursor:pointer;font-family:var(--body);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-btn{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.2));border:1px dashed var(--accent);border-radius:12px;padding:12px;width:100%;color:var(--accent2);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
 .add-btn:hover{background:rgba(124,58,237,.3)}
+.mission-type-select{display:flex;gap:6px;flex-wrap:wrap}
+.type-opt{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--body);color:var(--text);transition:all .2s}
+.type-opt.selected{border-color:var(--accent2);color:var(--accent2);background:rgba(6,182,212,.1)}
 </style>
 </head>
 <body>
@@ -221,39 +218,25 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="tab active" onclick="switchTab('tracker')" data-tab="tracker">📊 本週追蹤</div>
   <div class="tab" onclick="switchTab('chat')" data-tab="chat">🐱 助理</div>
   <div class="tab" onclick="switchTab('missions')" data-tab="missions">🎯 任務</div>
+  <div class="tab" onclick="switchTab('skills')" data-tab="skills">⚡ 技能</div>
   <div class="tab" onclick="switchTab('settings')" data-tab="settings">⚙️ 設定</div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="levelup-overlay" id="levelupOverlay" onclick="this.classList.remove('show')">
-  <div style="font-size:60px">🎉</div>
+  <div style="font-size:60px" id="levelupEmoji">🎉</div>
   <div class="levelup-text" id="levelupText">LEVEL UP!</div>
-  <div style="font-size:14px;color:var(--text)" id="levelupSub"></div>
-  <div style="font-size:11px;color:var(--muted);margin-top:20px">點任意處繼續</div>
+  <div class="levelup-reward" id="levelupReward"></div>
+  <div style="font-size:11px;color:var(--muted);margin-top:16px">點任意處繼續</div>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h3>✏️ <span id="modalTitle">新增習慣</span></h3>
-    <div class="modal-row"><label>習慣名稱</label><input type="text" id="modalName" placeholder="例：重訓、英文練習..."></div>
-    <div class="modal-row"><label>週目標次數</label><input type="number" id="modalGoal" min="1" max="7" value="3"></div>
-    <div class="modal-row"><label>分類</label>
-      <select id="modalCat">
-        <option value="運動">💪 運動</option><option value="語言">🗣️ 語言</option>
-        <option value="興趣">🎨 興趣</option><option value="飲食">🥗 飲食</option>
-        <option value="閱讀">📚 閱讀</option><option value="其他">⭐ 其他</option>
-      </select>
-    </div>
-    <div class="modal-row"><label>備註（選填）</label><input type="text" id="modalNote" placeholder="例：每次10分鐘"></div>
-    <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeModal()">取消</button>
-      <button class="btn-primary" onclick="saveHabit()">儲存</button>
-    </div>
-  </div>
+  <div class="modal" id="modalContent"></div>
 </div>
 
 <div class="content">
+  <!-- TRACKER -->
   <div class="page active" id="page-tracker">
     <div id="trackerLoading" class="loading-screen">
       <div class="loading-spinner"></div>
@@ -281,10 +264,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="date-label" id="dateLabel"></div>
       </div>
       <div id="habitsContainer"></div>
-      <button class="add-btn" onclick="openModal()">➕ 新增習慣</button>
+      <button class="add-btn" onclick="openHabitModal()">➕ 新增習慣</button>
     </div>
   </div>
 
+  <!-- CHAT -->
   <div class="page" id="page-chat">
     <div class="chat-section">
       <div class="chat-header">
@@ -309,14 +293,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="quick-btns" id="quickBtns"></div>
   </div>
 
+  <!-- MISSIONS -->
   <div class="page" id="page-missions">
-    <div class="section-title">🎯 月度任務</div>
+    <div class="section-title">🎯 進行中的任務</div>
     <div id="missionsContainer"></div>
-    <button class="add-btn" onclick="addMission()">➕ 新增任務</button>
-    <div class="section-title" style="margin-top:20px">📊 技能樹</div>
+    <button class="add-btn" onclick="openMissionModal()">➕ 新增任務</button>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="page" id="page-skills">
+    <div class="section-title">⚡ 你的技能樹</div>
     <div id="skillsContainer"></div>
   </div>
 
+  <!-- SETTINGS -->
   <div class="page" id="page-settings">
     <div class="settings-group">
       <h3>☁️ Firebase 同步</h3>
@@ -325,7 +315,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <button class="btn-primary" style="padding:6px 12px;font-size:11px;flex:0" onclick="forceSave()">立即同步</button>
       </div>
       <div style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:10px;padding:10px;margin-top:8px;font-size:11px;color:var(--muted);line-height:1.6">
-        💡 資料存在 Firebase Firestore（專案：claude-e5a82），任何設備用瀏覽器開啟這個 HTML 都能同步。
+        💡 資料存在 Firebase（claude-e5a82），任何設備開啟此 HTML 都能同步。每週一 00:00 自動重置。
       </div>
     </div>
     <div class="settings-group">
@@ -346,78 +336,102 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <button class="toggle on" id="toggle-night" onclick="toggleSetting(this)"></button>
       </div>
       <div class="setting-row">
-        <div><div class="setting-label">瀏覽器通知</div><div class="setting-sub" id="notifStatus">點擊啟用推播</div></div>
+        <div><div class="setting-label">瀏覽器通知</div><div class="setting-sub" id="notifStatus">點擊啟用</div></div>
         <button class="btn-primary" style="padding:6px 12px;font-size:11px;flex:0" onclick="requestNotif()">啟用</button>
       </div>
     </div>
     <div class="settings-group">
       <h3>📋 習慣管理</h3>
       <div id="habitManageList"></div>
-      <button class="add-btn" onclick="openModal()" style="margin-top:8px">➕ 新增習慣</button>
+      <button class="add-btn" onclick="openHabitModal()" style="margin-top:8px">➕ 新增習慣</button>
     </div>
     <div class="settings-group">
       <h3>🗄️ 資料</h3>
       <div class="setting-row">
-        <div><div class="setting-label">重置本週</div><div class="setting-sub">清除本週打卡（歷史保留）</div></div>
+        <div><div class="setting-label">手動重置本週</div><div class="setting-sub">清除本週打卡（歷史保留）</div></div>
         <button class="btn-secondary" style="padding:6px 12px;font-size:11px;color:var(--red);border-color:rgba(239,68,68,.4)" onclick="resetWeek()">重置</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
 const app = initializeApp({
-  apiKey: "AIzaSyCtvgwpmUqcmf5q6okIO84D_m_TfYCiA6Y",
-  authDomain: "claude-e5a82.firebaseapp.com",
-  projectId: "claude-e5a82",
-  storageBucket: "claude-e5a82.firebasestorage.app",
-  messagingSenderId: "166417271324",
-  appId: "1:166417271324:web:99ad693c783d6326d6add9"
+  apiKey:"AIzaSyCtvgwpmUqcmf5q6okIO84D_m_TfYCiA6Y",
+  authDomain:"claude-e5a82.firebaseapp.com",
+  projectId:"claude-e5a82",
+  storageBucket:"claude-e5a82.firebasestorage.app",
+  messagingSenderId:"166417271324",
+  appId:"1:166417271324:web:99ad693c783d6326d6add9"
 });
-
 const db = getFirestore(app);
-const REF = doc(db, 'rpg', 'main');
-
-window._fbLoad = async () => {
-  const snap = await getDoc(REF);
-  return snap.exists() ? snap.data() : null;
-};
-window._fbSave = async (data) => { await setDoc(REF, data); };
+const REF = doc(db,'rpg','main');
+window._fbLoad = async () => { const s=await getDoc(REF); return s.exists()?s.data():null; };
+window._fbSave = async (d) => { await setDoc(REF,d); };
 window._fbReady = true;
 window.dispatchEvent(new Event('fbReady'));
 </script>
 
 <script>
+// ─────────── DATA ───────────
 const DEFAULT = {
-  playerName:'冒險者',level:1,totalExp:30,
-  weekStart:getMonday().toISOString(),
+  playerName:'冒險者', level:1, totalExp:30,
+  weekStart: getThisMonday().toISOString(),
   habits:[
-    {id:1,name:'重訓',cat:'運動',goal:3,note:'',count:1,failed:false},
-    {id:2,name:'有氧',cat:'運動',goal:3,note:'',count:2,failed:false},
-    {id:3,name:'英文發音練習',cat:'語言',goal:3,note:'每次10分鐘',count:0,failed:false},
-    {id:4,name:'Mock Interview',cat:'語言',goal:3,note:'每次10分鐘',count:0,failed:false},
-    {id:5,name:'日文檢定準備',cat:'語言',goal:2,note:'每次30分鐘',count:0,failed:false},
-    {id:6,name:'唱歌',cat:'興趣',goal:1,note:'',count:1,failed:false},
-    {id:7,name:'跳舞',cat:'興趣',goal:1,note:'',count:0,failed:false},
-    {id:8,name:'戒糖',cat:'飲食',goal:7,note:'每天都要！',count:0,failed:true},
-    {id:9,name:'自己煮菜',cat:'飲食',goal:3,note:'',count:0,failed:false},
-    {id:10,name:'閱讀',cat:'閱讀',goal:2,note:'原子習慣',count:2,failed:false},
+    {id:1,name:'重訓',cat:'運動',goal:3,note:'',type:'count',logs:[]},
+    {id:2,name:'有氧',cat:'運動',goal:3,note:'',type:'count',logs:[]},
+    {id:3,name:'英文發音練習',cat:'語言',goal:3,note:'每次10分鐘',type:'count',logs:[]},
+    {id:4,name:'Mock Interview',cat:'語言',goal:3,note:'每次10分鐘',type:'count',logs:[]},
+    {id:5,name:'日文檢定準備',cat:'語言',goal:2,note:'每次30分鐘',type:'count',logs:[]},
+    {id:6,name:'唱歌',cat:'興趣',goal:1,note:'',type:'count',logs:[]},
+    {id:7,name:'跳舞',cat:'興趣',goal:1,note:'',type:'count',logs:[]},
+    {id:8,name:'戒糖',cat:'飲食',goal:7,note:'每天都要！',type:'daily',logs:[]},
+    {id:9,name:'自己煮菜',cat:'飲食',goal:3,note:'',type:'count',logs:[]},
+    {id:10,name:'閱讀',cat:'閱讀',goal:2,note:'原子習慣',type:'count',logs:[]},
   ],
   missions:[
-    {id:1,name:'英文面試準備',type:'skill',goal:'準備好一版流利的英文面試內容',reward:125,
-      milestones:['完成英文自我介紹草稿','練習至流利程度','完成面試QA準備'],done:[false,false,false]},
-    {id:2,name:'減重挑戰',type:'challenge',goal:'83kg → 81kg',reward:150,
-      milestones:['降至82.5kg','降至82kg','達成81kg 🎯'],done:[false,false,false]},
-    {id:3,name:'文章創作',type:'create',goal:'至少寫好三篇文章並發布',reward:100,
-      milestones:['完成第一篇文章','完成第二篇文章','完成第三篇文章'],done:[false,false,false]},
+    {
+      id:1, name:'英文面試準備', type:'skill',
+      goal:'準備好一版流利的英文面試內容',
+      reward:125, multiplier:'x2.5',
+      milestones:[
+        {text:'完成英文自我介紹草稿',exp:35,done:false},
+        {text:'練習至流利程度（可不看稿）',exp:40,done:false},
+        {text:'完成面試 QA 準備',exp:50,done:false},
+      ],
+      loot:['🎖️ 稱號：英語戰士','🗣️ 語言系永久 +15% EXP','🃏 特效：面試光環（自信 buff 加持）']
+    },
+    {
+      id:2, name:'減重挑戰', type:'challenge',
+      goal:'83kg → 81kg（減重 2kg）',
+      reward:150, multiplier:'x3',
+      milestones:[
+        {text:'降至 82.5kg',exp:40,done:false},
+        {text:'降至 82kg',exp:50,done:false},
+        {text:'達成目標 81kg 🎯',exp:60,done:false},
+      ],
+      loot:['🏆 稱號：意志鐵人','💪 體能系永久 +20% EXP','🃏 特效：代謝爆發（持續一週）']
+    },
+    {
+      id:3, name:'文章創作計畫', type:'create',
+      goal:'寫好三篇文章並全數發布',
+      reward:100, multiplier:'x2',
+      milestones:[
+        {text:'完成第一篇文章',exp:20,done:false},
+        {text:'完成第二篇文章',exp:25,done:false},
+        {text:'完成第三篇文章',exp:30,done:false},
+        {text:'三篇全數發布上線 🚀',exp:25,done:false},
+      ],
+      loot:['✍️ 稱號：創作者','📚 智慧系永久 +15% EXP','🃏 特效：文思泉湧（靈感無限）']
+    },
   ],
-  records:[],reminders:{noon:true,night:true}
+  records:[], reminders:{noon:true,night:true}
 };
 
-const CAT={
+const CAT = {
   '運動':{icon:'💪',color:'#10b981',label:'體能系'},
   '語言':{icon:'🗣️',color:'#06b6d4',label:'語言系'},
   '興趣':{icon:'🎨',color:'#f59e0b',label:'藝能系'},
@@ -426,323 +440,592 @@ const CAT={
   '其他':{icon:'⭐',color:'#64748b',label:'其他'},
 };
 
-const EXP=10, EXPNEXT=lv=>lv*100;
-let S=null, saveTimer=null;
+// Skill definitions — memes are based on YOUR actual habits
+const SKILL_DEFS = [
+  {
+    cat:'運動', icon:'💪', color:'#10b981',
+    thresholds:[
+      {exp:0,   name:'剛辦健身房會員', meme:'辦了會員卡，第一週去了三次，第二週…會員卡在皮夾裡靜靜發光', perks:['移動能力解鎖','私教預約技能'], surprise:'💳'},
+      {exp:50,  name:'重訓見習生', meme:'上完私教課隔天，下樓梯用屁股一階一階滑下去', perks:['肌肉喚醒','DOMS 體驗卡（買一送一）'], surprise:'🦀'},
+      {exp:150, name:'有氧跑步俠', meme:'跑步30分鐘，結束後覺得自己可以吃回來，然後真的吃了', perks:['心肺耐力+','跑步姿勢不再像企鵝'], surprise:'🏃'},
+      {exp:300, name:'重訓＋有氧二刀流', meme:'重訓完順便多做10分鐘有氧「反正舉手之勞」——真實發生過', perks:['燃脂效率翻倍','習慣疊加大師'], surprise:'⚔️'},
+      {exp:500, name:'筋膜槍俠', meme:'運動完筋膜槍一打、身體乳一抹，整個人散發「我很自律」的氣場', perks:['體能系 +20% EXP','解鎖：恢復大師'], surprise:'🔫'},
+    ]
+  },
+  {
+    cat:'語言', icon:'🗣️', color:'#06b6d4',
+    thresholds:[
+      {exp:0,   name:'英文發音見習生', meme:'每次練英文發音，對著空氣講話，然後回放錄音，立刻刪掉', perks:['母音初始化','基礎羞恥心克服'], surprise:'🎤'},
+      {exp:50,  name:'Mock Interview 新兵', meme:'第一次練 Mock Interview，問自己「Tell me about yourself」，沉默10秒', perks:['STAR 法則入門','面試焦慮免疫 Lv.1'], surprise:'😅'},
+      {exp:150, name:'每日10分鐘戰士', meme:'「只要10分鐘！」——說完不知不覺練了30分鐘，停不下來', perks:['語感加速','發音清晰度+'], surprise:'⏱️'},
+      {exp:300, name:'日英雙修者', meme:'英文面試練到流利，日文檢定也在衝，腦子裡三種語言同時打架', perks:['多語言緩衝區','語言切換不打結'], surprise:'🗾'},
+      {exp:500, name:'面試無敵艦隊', meme:'被問到任何問題都能用 STAR 法則回答，包括「你今天吃什麼」', perks:['語言系 +25% EXP','解鎖：語言傳說'], surprise:'🚢'},
+    ]
+  },
+  {
+    cat:'興趣', icon:'🎨', color:'#f59e0b',
+    thresholds:[
+      {exp:0,   name:'浴室歌神候選人', meme:'唱歌課還沒上，但洗澡的時候已經覺得自己可以出道了', perks:['音感初始化','音量控制（待解鎖）'], surprise:'🚿'},
+      {exp:30,  name:'唱歌課新生', meme:'上完第一堂唱歌課，老師說「你有潛力」，開心了三天', perks:['呼吸技巧解鎖','音準 +5%'], surprise:'🎵'},
+      {exp:80,  name:'唱跳二修生', meme:'同時上唱歌課和跳舞課，跳舞的時候忍不住想唱，唱歌時腿在抖', perks:['肢體協調+','節拍感強化'], surprise:'💃'},
+      {exp:180, name:'舞台感覺醒者', meme:'跳舞自主練習到一半，突然覺得「欸我好像還可以」，沒有任何根據', perks:['表演慾解鎖','自信光環初現'], surprise:'✨'},
+      {exp:300, name:'全能藝人預備役', meme:'能唱能跳，朋友說「你去報名選秀吧」，認真考慮了三秒', perks:['藝能系 +20% EXP','解鎖：舞台之星'], surprise:'⭐'},
+    ]
+  },
+  {
+    cat:'飲食', icon:'🥗', color:'#f97316',
+    thresholds:[
+      {exp:0,   name:'抹茶蛋糕受害者', meme:'當天喝了甜的東西，主動在 App 裡按紅框，這種自覺就是成長的起點', perks:['誠實記錄技能','紅框接受度 Lv.1'], surprise:'🍰'},
+      {exp:30,  name:'戒糖見習生', meme:'路過手搖店，腳步放慢，眼神飄移，最後深呼吸繼續走——這很難的', perks:['意志力 Lv.1','血糖穩定 +10%'], surprise:'🧋'},
+      {exp:80,  name:'開伙戰士', meme:'自己煮菜，拍照，放IG限動，標記「今天也很認真生活」', perks:['廚藝初始化','外食依賴 -20%'], surprise:'🍳'},
+      {exp:150, name:'戒糖連勝紀錄保持人', meme:'連續五天戒糖成功，開始用「我最近在戒糖」當話題，朋友翻白眼', perks:['意志力 Lv.3','身體乳效果加成（皮膚變好）'], surprise:'🏅'},
+      {exp:280, name:'自律飲食傳說', meme:'既戒糖又自己煮，減重目標 83→81 進行中，81kg 等著你', perks:['養生系 +25% EXP','解鎖：代謝傳說'], surprise:'🥇'},
+    ]
+  },
+  {
+    cat:'閱讀', icon:'📚', color:'#8b5cf6',
+    thresholds:[
+      {exp:0,   name:'原子習慣購買者', meme:'買了《原子習慣》，看了前三頁，放在床邊當裝飾，也是一種習慣', perks:['書名記憶技能','封面鑑賞力'], surprise:'📖'},
+      {exp:40,  name:'原子習慣實踐者', meme:'讀到「每天進步1%」，然後把這個概念用在所有事情包括拖延', perks:['習慣疊加理論','2分鐘法則入門'], surprise:'⚛️'},
+      {exp:100, name:'每週兩次閱讀人', meme:'達成閱讀目標的那天，感覺自己比任何人都更有紀律（直到下週）', perks:['知識連結能力+','批判思考初始化'], surprise:'🧠'},
+      {exp:200, name:'閱讀筆記狂', meme:'讀完《原子習慣》，開始把書裡的技巧應用在這個 App 上——這本書奏效了', perks:['知識應用力+','習慣設計大師'], surprise:'📝'},
+      {exp:350, name:'終身學習者', meme:'讀書已經是生活的一部分，就像呼吸，只是偶爾忘記，然後想起來，繼續', perks:['智慧系 +25% EXP','解鎖：知識傳說'], surprise:'🌟'},
+    ]
+  },
+];
 
-function getMonday(){
-  const d=new Date(); d.setHours(0,0,0,0);
-  const day=d.getDay(); d.setDate(d.getDate()-day+(day===0?-6:1));
+const EXP_PER = 10, EXPNEXT = lv => lv * 100;
+let S = null, saveTimer = null;
+
+function getThisMonday() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  const day = d.getDay();
+  // day=0 is Sunday, need to go back to Monday
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
   return d;
 }
-function getWeekNum(){
-  const d=new Date(),j=new Date(d.getFullYear(),0,1);
+function getWeekNum() {
+  const d = new Date(), j = new Date(d.getFullYear(),0,1);
   return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);
 }
-
-function setSyncUI(status,msg){
-  const b=document.getElementById('syncBanner');
-  b.className='sync-banner '+status;
-  document.getElementById('syncText').textContent=msg;
-  const s=document.getElementById('syncStatusText');
-  if(s) s.textContent=msg;
+function fmtTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('zh-TW',{month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'});
+}
+function fmtShortTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
 }
 
-async function loadData(){
+// ─────────── SYNC ───────────
+function setSyncUI(status, msg) {
+  const b = document.getElementById('syncBanner');
+  b.className = 'sync-banner ' + status;
+  document.getElementById('syncText').textContent = msg;
+  const s = document.getElementById('syncStatusText');
+  if(s) s.textContent = msg;
+}
+
+async function loadData() {
   setSyncUI('syncing','☁️ 載入 Firebase 資料...');
-  try{
-    const data=await window._fbLoad();
-    if(data){
-      S=data;
-      const stored=new Date(S.weekStart), curr=getMonday();
-      if(stored.toDateString()!==curr.toDateString()){
-        S.habits.forEach(h=>{h.count=0;h.failed=false;});
-        S.weekStart=curr.toISOString();
+  try {
+    const data = await window._fbLoad();
+    if(data) {
+      S = data;
+      // Ensure new fields exist on old habits
+      S.habits.forEach(h => {
+        if(!h.logs) h.logs = [];
+        if(!h.type) h.type = 'count';
+      });
+      // Check week reset (Monday 00:00)
+      const storedMonday = new Date(S.weekStart);
+      const currMonday = getThisMonday();
+      if(storedMonday.toDateString() !== currMonday.toDateString()) {
+        // Archive then reset
+        S.habits.forEach(h => { h.logs = []; });
+        S.weekStart = currMonday.toISOString();
         await saveData();
       }
     } else {
-      S=JSON.parse(JSON.stringify(DEFAULT));
-      S.weekStart=getMonday().toISOString();
+      S = JSON.parse(JSON.stringify(DEFAULT));
+      S.weekStart = getThisMonday().toISOString();
       await saveData();
     }
     setSyncUI('ok','✅ Firebase 已連線 · 跨設備同步中');
-  } catch(e){
-    S=JSON.parse(JSON.stringify(DEFAULT));
+  } catch(e) {
+    S = JSON.parse(JSON.stringify(DEFAULT));
     setSyncUI('error','⚠️ 連線失敗：'+e.message);
-    console.error(e);
   }
 }
 
-async function saveData(){
+async function saveData() {
   setSyncUI('syncing','💾 同步中...');
-  try{
+  try {
     await window._fbSave(S);
     setSyncUI('ok','✅ 已同步 · '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
-  } catch(e){
+  } catch(e) {
     setSyncUI('error','⚠️ 同步失敗：'+e.message);
-    console.error(e);
   }
 }
-
 function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,800);}
 async function forceSave(){await saveData();showToast('☁️ 強制同步完成！');}
 
-function renderTracker(){
-  document.getElementById('weekLabel').textContent=`📅 第 ${getWeekNum()} 週習慣追蹤`;
-  document.getElementById('dateLabel').textContent=new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'long'});
+// ─────────── RENDER TRACKER ───────────
+function renderTracker() {
+  document.getElementById('weekLabel').textContent = `📅 第 ${getWeekNum()} 週習慣追蹤`;
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'long'});
   updateCard();
-  const cats={};
-  S.habits.forEach(h=>{if(!cats[h.cat])cats[h.cat]=[];cats[h.cat].push(h);});
-  const c=document.getElementById('habitsContainer'); c.innerHTML='';
-  Object.entries(cats).forEach(([cat,habits])=>{
-    const cfg=CAT[cat]||CAT['其他'];
-    const div=document.createElement('div'); div.className='category';
-    div.innerHTML=`<div class="cat-header"><span class="cat-icon">${cfg.icon}</span><span class="cat-name" style="color:${cfg.color}">${cat}</span></div>`;
-    habits.forEach(h=>div.appendChild(buildHabitEl(h)));
+  const cats = {};
+  S.habits.forEach(h => {if(!cats[h.cat]) cats[h.cat]=[]; cats[h.cat].push(h);});
+  const c = document.getElementById('habitsContainer'); c.innerHTML = '';
+  Object.entries(cats).forEach(([cat, habits]) => {
+    const cfg = CAT[cat]||CAT['其他'];
+    const div = document.createElement('div'); div.className = 'category';
+    div.innerHTML = `<div class="cat-header"><span class="cat-icon">${cfg.icon}</span><span class="cat-name" style="color:${cfg.color}">${cat}</span></div>`;
+    habits.forEach(h => div.appendChild(buildHabitEl(h)));
     c.appendChild(div);
   });
   renderQuickBtns(); renderHabitManage();
 }
 
-function buildHabitEl(h){
-  const cfg=CAT[h.cat]||CAT['其他'];
-  let blocks='';
-  for(let i=0;i<h.goal;i++){
-    if(h.name==='戒糖'&&h.failed&&i===0) blocks+=`<div class="block fail">❌</div>`;
-    else if(i<h.count) blocks+=`<div class="block done" style="background:${cfg.color}85">✓</div>`;
-    else blocks+=`<div class="block"></div>`;
+function getHabitStats(h) {
+  // For 'daily' type (like 戒糖): each day can be success or fail
+  // For 'count' type: just count of successes
+  const successLogs = h.logs.filter(l => l.action === 'checkin');
+  const failLogs = h.logs.filter(l => l.action === 'fail');
+  return { success: successLogs.length, fail: failLogs.length, total: h.logs.length };
+}
+
+function buildHabitEl(h) {
+  const cfg = CAT[h.cat]||CAT['其他'];
+  const stats = getHabitStats(h);
+  const isDone = stats.success >= h.goal;
+
+  let blocks = '';
+  if(h.type === 'daily') {
+    // Show each log as success or fail in order
+    const allLogs = [...h.logs].sort((a,b) => new Date(a.date) - new Date(b.date));
+    for(let i = 0; i < h.goal; i++) {
+      const log = allLogs[i];
+      if(!log) {
+        blocks += `<div class="block empty" title="尚未記錄"></div>`;
+      } else if(log.action === 'checkin') {
+        blocks += `<div class="block done" style="background:${cfg.color}90" title="${fmtTime(log.date)}">✓</div>`;
+      } else {
+        blocks += `<div class="block fail-mark" title="${fmtTime(log.date)}">✗</div>`;
+      }
+    }
+  } else {
+    for(let i = 0; i < h.goal; i++) {
+      if(i < stats.success) {
+        const log = h.logs.filter(l=>l.action==='checkin')[i];
+        const tt = log ? fmtTime(log.date) : '';
+        blocks += `<div class="block done" style="background:${cfg.color}90" title="${tt}">✓</div>`;
+      } else {
+        blocks += `<div class="block empty"></div>`;
+      }
+    }
   }
-  const el=document.createElement('div');
-  el.className='habit-item'+(h.failed?' failed':'');
-  el.innerHTML=`
+
+  // Recent logs (last 3)
+  const recentLogs = [...h.logs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
+  const logHtml = recentLogs.length ? `<div class="habit-log">${recentLogs.map(l =>
+    `<div class="log-entry">${l.action==='checkin'?'✅':'❌'} <span class="log-time">${fmtTime(l.date)}</span></div>`
+  ).join('')}</div>` : '';
+
+  const el = document.createElement('div');
+  el.className = 'habit-item' + (stats.fail > 0 && !isDone ? ' partial-fail' : '');
+
+  const dailyInfo = h.type === 'daily' ?
+    `<span style="font-size:10px;color:var(--green)">✓${stats.success}</span> <span style="font-size:10px;color:var(--red)">✗${stats.fail}</span>` :
+    `<span class="progress-text">${stats.success}/${h.goal}</span>`;
+
+  el.innerHTML = `
     <div class="habit-top">
-      <div class="habit-name">${h.name} ${h.count>=h.goal?'✅':''}</div>
-      <div class="habit-meta"><span class="lv-badge">Lv.${h.count}</span><span class="exp-badge">⚡${h.count*EXP}</span></div>
+      <div class="habit-name">${h.name} ${isDone ? '✅' : ''}</div>
+      <div class="habit-meta">
+        <span class="lv-badge">Lv.${stats.success}</span>
+        <span class="exp-badge">⚡${stats.success * EXP_PER}</span>
+      </div>
     </div>
     <div class="progress-row">
       <div class="blocks">${blocks}</div>
-      <span class="progress-text">${h.count}/${h.goal}</span>
-      ${h.name==='戒糖'
-        ?`<button class="checkin-btn fail-btn" onclick="markFail(${h.id},event)">紅框</button><button class="checkin-btn" onclick="checkin(${h.id},event)">達標</button>`
-        :`<button class="checkin-btn" onclick="checkin(${h.id},event)">+1</button>`}
+      ${dailyInfo}
+      <div class="btn-row">
+        ${h.type === 'daily' ?
+          `<button class="checkin-btn fail-btn" onclick="addLog(${h.id},'fail',event)">✗</button>
+           <button class="checkin-btn" onclick="addLog(${h.id},'checkin',event)">✓</button>` :
+          `<button class="checkin-btn" onclick="addLog(${h.id},'checkin',event)">+1</button>`
+        }
+        ${h.logs.length > 0 ? `<button class="checkin-btn undo-btn" onclick="undoLog(${h.id},event)">撤銷</button>` : ''}
+      </div>
     </div>
-    ${h.note?`<div class="habit-note">⏱ ${h.note}</div>`:''}`;
+    ${h.note ? `<div class="habit-note">⏱ ${h.note}</div>` : ''}
+    ${logHtml}`;
   return el;
 }
 
-function updateCard(){
-  const need=EXPNEXT(S.level), cur=S.totalExp%need;
-  document.getElementById('expFill').style.width=Math.min(cur/need*100,100)+'%';
-  document.getElementById('expDisplay').textContent=`${cur} / ${need} EXP → Lv.${S.level+1}`;
-  document.getElementById('lvBadge').textContent=`⚡ Lv.${S.level}`;
-  document.getElementById('playerName').textContent=S.playerName;
-  document.getElementById('settingNameSub').textContent=S.playerName;
-  const titles=['初心者','覺醒者','修行者','強者','英雄','傳奇','神話'];
-  document.getElementById('playerTitle').textContent='✨ '+(titles[S.level-1]||'神話');
-  const done=S.habits.filter(h=>h.count>=h.goal).length;
-  document.getElementById('weekScore').textContent=S.habits.length?Math.round(done/S.habits.length*100)+'%':'0%';
-  document.getElementById('statsRow').innerHTML=Object.entries(CAT).map(([cat,cfg])=>{
+function updateCard() {
+  const need = EXPNEXT(S.level), cur = S.totalExp % need;
+  document.getElementById('expFill').style.width = Math.min(cur/need*100, 100) + '%';
+  document.getElementById('expDisplay').textContent = `${cur} / ${need} EXP → Lv.${S.level+1}`;
+  document.getElementById('lvBadge').textContent = `⚡ Lv.${S.level}`;
+  document.getElementById('playerName').textContent = S.playerName;
+  document.getElementById('settingNameSub').textContent = S.playerName;
+  const titles = ['初心者','覺醒者','修行者','強者','英雄','傳奇','神話'];
+  document.getElementById('playerTitle').textContent = '✨ ' + (titles[S.level-1]||'神話');
+  const done = S.habits.filter(h => getHabitStats(h).success >= h.goal).length;
+  document.getElementById('weekScore').textContent = S.habits.length ? Math.round(done/S.habits.length*100)+'%' : '0%';
+  document.getElementById('statsRow').innerHTML = Object.entries(CAT).map(([cat,cfg]) => {
     if(!S.habits.some(h=>h.cat===cat)) return '';
-    const exp=S.habits.filter(h=>h.cat===cat).reduce((s,h)=>s+h.count*EXP,0);
+    const exp = S.habits.filter(h=>h.cat===cat).reduce((s,h)=>s+getHabitStats(h).success*EXP_PER,0);
     return `<div class="stat-chip" style="border-color:${cfg.color}30;color:${cfg.color}">${cfg.icon} ${exp} EXP</div>`;
   }).join('');
 }
 
-function renderMissions(){
-  const tm={skill:['type-skill','技能'],challenge:['type-challenge','挑戰'],create:['type-create','創作']};
-  document.getElementById('missionsContainer').innerHTML=S.missions.map(m=>{
-    const [cls,lbl]=tm[m.type]||['type-skill','其他'];
-    const pct=m.milestones.length?m.done.filter(Boolean).length/m.milestones.length*100:0;
-    const miles=m.milestones.map((ms,i)=>`<div class="milestone ${m.done[i]?'done':''}" onclick="toggleMilestone(${m.id},${i})"><span>${m.done[i]?'✅':'☐'}</span> <span>${ms}</span></div>`).join('');
-    return `<div class="mission-card">
-      <div class="mission-top"><div class="mission-name">${m.name}</div><div class="mission-type ${cls}">${lbl}</div></div>
+// ─────────── ACTIONS ───────────
+function addLog(id, action, e) {
+  e && e.stopPropagation();
+  const h = S.habits.find(x => x.id === id); if(!h) return;
+  const now = new Date().toISOString();
+  h.logs.push({date: now, action});
+  if(action === 'checkin') {
+    S.totalExp += EXP_PER;
+    S.records.push({date:now, habitId:id, habitName:h.name, action:'checkin'});
+    if(S.totalExp >= S.level * EXPNEXT(S.level)) { S.level++; showLevelUp(S.level); }
+    const stats = getHabitStats(h);
+    if(stats.success >= h.goal) addBotMsg(`🎉 ${h.name}本週目標達成！太棒了！+${EXP_PER} EXP ✅`);
+    else addBotMsg(`收到！${h.name} ${stats.success}/${h.goal} ✓ +${EXP_PER} EXP 繼續加油！🐱`);
+    showToast(`✅ ${h.name} 打卡成功 ⚡+${EXP_PER} EXP`);
+  } else {
+    addBotMsg(`${h.name} 今日未達標已記錄 ✗ 決不連續失敗兩次！🐱💪`);
+    showToast(`✗ ${h.name} 紅框記錄`);
+  }
+  scheduleSave(); renderTracker();
+}
+
+function undoLog(id, e) {
+  e && e.stopPropagation();
+  const h = S.habits.find(x => x.id === id); if(!h || !h.logs.length) return;
+  const last = h.logs[h.logs.length - 1];
+  h.logs.pop();
+  if(last.action === 'checkin') {
+    S.totalExp = Math.max(0, S.totalExp - EXP_PER);
+  }
+  scheduleSave(); renderTracker();
+  showToast(`↩️ 已撤銷 ${h.name} 最後一筆記錄`);
+  addBotMsg(`好的，已撤銷 ${h.name} 的最後一筆打卡記錄！🐱`);
+}
+
+function quickCheckin(id) { addLog(id, 'checkin', null); switchTab('chat'); }
+
+// ─────────── MISSIONS ───────────
+function renderMissions() {
+  const tm = {skill:['type-skill','技能'],challenge:['type-challenge','挑戰'],create:['type-create','創作'],explore:['type-explore','探索']};
+  document.getElementById('missionsContainer').innerHTML = S.missions.map(m => {
+    const [cls,lbl] = tm[m.type]||['type-skill','其他'];
+    const milestones = m.milestones || [];
+    const doneCnt = milestones.filter(ms => ms.done).length;
+    const pct = milestones.length ? doneCnt/milestones.length*100 : 0;
+    const allDone = doneCnt === milestones.length && milestones.length > 0;
+    const milesHtml = milestones.map((ms, i) =>
+      `<div class="milestone ${ms.done?'done':''}" onclick="toggleMilestone(${m.id},${i})">
+        <span class="milestone-icon">${ms.done ? '✅' : '○'}</span>
+        <span class="milestone-text">${ms.text}</span>
+        <span class="milestone-exp">+${ms.exp} EXP</span>
+      </div>`).join('');
+    const loot = (m.loot||[]).map(l=>`<div class="reward-item">${l}</div>`).join('');
+    const lootHtml = m.loot && m.loot.length ? `
+      <div class="reward-preview">
+        <div class="reward-title">🎁 完成獎勵</div>
+        <div class="reward-items">${loot}</div>
+      </div>` : '';
+    return `<div class="mission-card ${allDone?'completed':''}">
+      <div class="mission-top">
+        <div class="mission-name">${allDone?'✅ ':''} ${m.name}</div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+          ${m.multiplier?`<span style="font-size:10px;color:var(--orange);font-weight:700;border:1px solid rgba(249,115,22,.4);border-radius:8px;padding:1px 6px">${m.multiplier}</span>`:''}
+          <div class="mission-type ${cls}">${lbl}</div>
+        </div>
+      </div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${m.goal}</div>
       <div class="mission-progress"><div class="mission-fill" style="width:${pct}%"></div></div>
-      <div class="mission-meta"><span>${Math.round(pct)}% 完成</span><span class="mission-reward">🏆 ${m.reward} EXP</span></div>
-      <div class="milestones">${miles}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('skillsContainer').innerHTML=Object.entries(CAT).map(([cat,cfg])=>{
-    const habits=S.habits.filter(h=>h.cat===cat); if(!habits.length) return '';
-    const exp=habits.reduce((s,h)=>s+h.count*EXP,0);
-    const lv=Math.floor(exp/50)+1,pct=(exp%50)/50*100;
-    return `<div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:700;color:${cfg.color}">${cfg.icon} ${cfg.label}</span>
-        <span style="font-size:11px;color:var(--muted)">Lv.${lv} · ${exp} EXP</span>
+      <div class="mission-meta">
+        <span>${Math.round(pct)}% · ${doneCnt}/${milestones.length} 里程碑</span>
+        <span class="mission-reward">🏆 ${m.reward} EXP</span>
       </div>
-      <div class="exp-bar"><div class="exp-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+      <div class="milestones">${milesHtml}</div>
+      ${lootHtml}
     </div>`;
   }).join('');
 }
 
-function renderQuickBtns(){
-  document.getElementById('quickBtns').innerHTML=S.habits.slice(0,8).map(h=>
+function toggleMilestone(mId, idx) {
+  const m = S.missions.find(x => x.id === mId); if(!m) return;
+  const ms = m.milestones[idx];
+  ms.done = !ms.done;
+  if(ms.done) {
+    S.totalExp += ms.exp;
+    showToast(`✅ 里程碑達成！+${ms.exp} EXP`);
+    addBotMsg(`🎯 里程碑「${ms.text}」完成！+${ms.exp} EXP 繼續衝！🐱`);
+    if(m.milestones.every(x=>x.done)) {
+      S.totalExp += m.reward;
+      setTimeout(()=>showMissionComplete(m), 500);
+    }
+  } else {
+    S.totalExp = Math.max(0, S.totalExp - ms.exp);
+  }
+  scheduleSave(); renderMissions(); updateCard();
+}
+
+function showMissionComplete(m) {
+  document.getElementById('levelupEmoji').textContent = '🏆';
+  document.getElementById('levelupText').textContent = `任務完成！\n${m.name}`;
+  const loot = (m.loot||[]).map(l=>`<div style="margin:3px 0">${l}</div>`).join('');
+  document.getElementById('levelupReward').innerHTML =
+    `<div style="color:var(--gold);font-weight:700;margin-bottom:8px">🎁 任務獎勵 +${m.reward} EXP</div>${loot}`;
+  document.getElementById('levelupOverlay').classList.add('show');
+}
+
+// ─────────── SKILLS ───────────
+function renderSkills() {
+  const c = document.getElementById('skillsContainer');
+  c.innerHTML = SKILL_DEFS.map(skillDef => {
+    const habits = S.habits.filter(h => h.cat === skillDef.cat);
+    const totalExp = habits.reduce((s,h) => s + getHabitStats(h).success * EXP_PER, 0);
+    const cfg = CAT[skillDef.cat] || CAT['其他'];
+
+    // Find current threshold
+    let curThr = skillDef.thresholds[0];
+    let nextThr = skillDef.thresholds[1];
+    for(let i = skillDef.thresholds.length-1; i >= 0; i--) {
+      if(totalExp >= skillDef.thresholds[i].exp) {
+        curThr = skillDef.thresholds[i];
+        nextThr = skillDef.thresholds[i+1] || null;
+        break;
+      }
+    }
+    const pct = nextThr ? Math.min((totalExp - curThr.exp)/(nextThr.exp - curThr.exp)*100, 100) : 100;
+    const lv = skillDef.thresholds.indexOf(curThr) + 1;
+
+    const perks = curThr.perks.map(p=>
+      `<div class="skill-unlock">${p}</div>`).join('');
+    const nextPerks = nextThr ? nextThr.perks.map(p=>
+      `<div class="skill-unlock locked">🔒 ${p}</div>`).join('') : '';
+
+    return `<div class="skill-card">
+      <div class="surprise-badge">${curThr.surprise}</div>
+      <div class="skill-header">
+        <span class="skill-icon-big">${skillDef.icon}</span>
+        <div>
+          <div class="skill-title">${curThr.name}</div>
+          <div class="skill-subtitle">${cfg.label}</div>
+          <div class="skill-lv">LV.${lv} · ${totalExp} EXP</div>
+        </div>
+      </div>
+      <div class="skill-meme">"${curThr.meme}"</div>
+      <div class="skill-desc">已解鎖技能</div>
+      <div class="skill-unlocks" style="margin-bottom:8px">${perks}</div>
+      ${nextThr ? `<div class="skill-desc">下一階段解鎖（還需 ${nextThr.exp - totalExp} EXP）</div>
+        <div class="skill-unlocks">${nextPerks}</div>` : '<div style="font-size:12px;color:var(--gold)">🏆 已達最高階段！</div>'}
+      <div class="skill-exp-bar" style="margin-top:10px">
+        <div class="skill-exp-fill" style="width:${pct}%;background:${cfg.color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────── CHAT ───────────
+function renderQuickBtns() {
+  document.getElementById('quickBtns').innerHTML = S.habits.slice(0,8).map(h =>
     `<button class="quick-btn" onclick="quickCheckin(${h.id})">${h.name} ✓</button>`).join('');
 }
-function renderHabitManage(){
-  document.getElementById('habitManageList').innerHTML=S.habits.map(h=>`
-    <div class="setting-row">
-      <div><div class="setting-label">${CAT[h.cat]?.icon||'⭐'} ${h.name}</div><div class="setting-sub">目標：${h.goal}次/週 · 完成：${h.count}次</div></div>
-      <div style="display:flex;gap:6px">
-        <button class="btn-secondary" style="padding:4px 8px;font-size:10px" onclick="openModal(${h.id})">編輯</button>
-        <button class="btn-secondary" style="padding:4px 8px;font-size:10px;color:var(--red);border-color:rgba(239,68,68,.4)" onclick="deleteHabit(${h.id})">刪除</button>
-      </div>
-    </div>`).join('');
+function addBotMsg(t) {
+  const c = document.getElementById('chatMessages');
+  c.innerHTML += `<div class="msg bot"><span class="msg-avatar">🐱</span><div class="msg-bubble">${t}</div></div>`;
+  c.scrollTop = c.scrollHeight;
 }
-
-function checkin(id,e){
-  e&&e.stopPropagation();
-  const h=S.habits.find(x=>x.id===id); if(!h) return;
-  h.count++;h.failed=false;S.totalExp+=EXP;
-  S.records.push({date:new Date().toISOString(),habitId:id,habitName:h.name,action:'checkin'});
-  if(S.totalExp>=S.level*EXPNEXT(S.level)){S.level++;showLevelUp(S.level);}
-  scheduleSave();renderTracker();
-  showToast(`✅ ${h.name} +1  ⚡+${EXP} EXP`);
-  if(h.count>=h.goal) addBotMsg(`🎉 ${h.name}本週目標達成！太棒了！+${EXP} EXP ✅`);
-  else addBotMsg(`收到！${h.name} ${h.count}/${h.goal} 🟩 +${EXP} EXP 繼續加油！🐱`);
+function addUserMsg(t) {
+  const c = document.getElementById('chatMessages');
+  c.innerHTML += `<div class="msg user"><span class="msg-avatar">👤</span><div class="msg-bubble">${t}</div></div>`;
+  c.scrollTop = c.scrollHeight;
 }
-function markFail(id,e){
-  e&&e.stopPropagation();
-  const h=S.habits.find(x=>x.id===id); if(!h) return;
-  h.failed=true;
-  S.records.push({date:new Date().toISOString(),habitId:id,habitName:h.name,action:'fail'});
-  scheduleSave();renderTracker();
-  showToast(`❌ ${h.name} 今天紅框`);
-  addBotMsg(`${h.name} 今日紅框已記錄 ❌ 決不連續失敗兩次，明天一定行！🐱💪`);
+function sendMessage() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim(); if(!text) return;
+  inp.value = ''; addUserMsg(text); processChat(text);
 }
-function quickCheckin(id){checkin(id,null);switchTab('chat');}
-function toggleMilestone(mId,idx){
-  const m=S.missions.find(x=>x.id===mId); if(!m) return;
-  m.done[idx]=!m.done[idx];
-  if(m.done.every(Boolean)){
-    S.totalExp+=m.reward;
-    showToast(`🏆 任務完成！+${m.reward} EXP`);
-    addBotMsg(`🎊 任務「${m.name}」全數完成！+${m.reward} EXP 🏆 你超強的！🐱`);
-  }
-  scheduleSave();renderMissions();
-}
-
-function addBotMsg(t){
-  const c=document.getElementById('chatMessages');
-  c.innerHTML+=`<div class="msg bot"><span class="msg-avatar">🐱</span><div class="msg-bubble">${t}</div></div>`;
-  c.scrollTop=c.scrollHeight;
-}
-function addUserMsg(t){
-  const c=document.getElementById('chatMessages');
-  c.innerHTML+=`<div class="msg user"><span class="msg-avatar">👤</span><div class="msg-bubble">${t}</div></div>`;
-  c.scrollTop=c.scrollHeight;
-}
-function sendMessage(){
-  const inp=document.getElementById('chatInput');
-  const text=inp.value.trim(); if(!text) return;
-  inp.value=''; addUserMsg(text); processChat(text);
-}
-async function processChat(text){
-  const summary=S.habits.map(h=>`${h.name}:${h.count}/${h.goal}`).join(',');
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
+async function processChat(text) {
+  const summary = S.habits.map(h=>{const s=getHabitStats(h);return `${h.name}:${s.success}/${h.goal}`;}).join(',');
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-sonnet-4-20250514",max_tokens:150,
         system:`你是 OpenClaw，熱情有趣的人生RPG習慣助理🐱。繁體中文、簡短有力（60字內）、多用emoji。
-玩家：${S.playerName} Lv.${S.level} ${S.totalExp}EXP
-本週進度：${summary}
+玩家：${S.playerName} Lv.${S.level} ${S.totalExp}EXP 本週進度：${summary}
 習慣：${S.habits.map(h=>h.name).join('、')}
-提到完成習慣→說已記錄+10EXP並鼓勵；提到失敗/吃糖→說紅框已記錄鼓勵明天`,
+提到完成習慣→說已記錄+10EXP並鼓勵；提到失敗→說已記錄鼓勵明天`,
         messages:[{role:"user",content:text}]
       })
     });
-    const data=await res.json();
-    const reply=data.content?.map(b=>b.text||'').join('');
-    if(reply){autoDetectCheckin(text);addBotMsg(reply);return;}
-  } catch(e){}
-  if(text.includes('戒糖')&&/失敗|吃了|沒戒/.test(text)){
-    const h=S.habits.find(x=>x.name==='戒糖');
-    if(h)h.failed=true;scheduleSave();renderTracker();
-    addBotMsg('戒糖紅框已記錄 ❌ 明天重新開始！🐱');return;
+    const data = await res.json();
+    const reply = data.content?.map(b=>b.text||'').join('');
+    if(reply) { autoDetectCheckin(text); addBotMsg(reply); return; }
+  } catch(e) {}
+  if(text.includes('撤銷')||text.includes('取消')) {
+    addBotMsg('要撤銷哪個習慣的記錄呢？直接點習慣旁邊的「撤銷」按鈕就可以囉！🐱');return;
   }
-  const matched=autoDetectCheckin(text);
-  if(matched.length){addBotMsg(`已記錄：${matched.join('、')} ✅ +${matched.length*EXP} EXP！🔥🐱`);return;}
-  const fb=['有什麼習慣完成了嗎？告訴我！⚡🐱','加油！每個行動都在累積EXP！💪🐱','說說今天進度～🎮🐱'];
+  const matched = autoDetectCheckin(text);
+  if(matched.length) { addBotMsg(`已記錄：${matched.join('、')} ✅ +${matched.length*EXP_PER} EXP！🔥🐱`); return; }
+  const fb = ['有什麼習慣完成了嗎？告訴我！⚡🐱','加油！每個行動都在累積EXP！💪🐱','說說今天進度～🎮🐱'];
   addBotMsg(fb[Math.floor(Math.random()*fb.length)]);
 }
-function autoDetectCheckin(text){
-  const matched=[];
-  S.habits.forEach(h=>{
-    if(text.includes(h.name)&&/完成|做了|跑|練|讀|看|上了|去了/.test(text)){
-      h.count++;S.totalExp+=EXP;
+function autoDetectCheckin(text) {
+  const matched = [];
+  S.habits.forEach(h => {
+    if(text.includes(h.name) && /完成|做了|跑|練|讀|看|上了|去了/.test(text)) {
+      h.logs.push({date:new Date().toISOString(),action:'checkin'});
+      S.totalExp += EXP_PER;
       S.records.push({date:new Date().toISOString(),habitId:h.id,habitName:h.name,action:'chat'});
       matched.push(h.name);
     }
   });
-  if(matched.length){scheduleSave();renderTracker();}
+  if(matched.length) { scheduleSave(); renderTracker(); }
   return matched;
 }
 
-let editId=null;
-function openModal(id){
-  editId=id||null;
-  if(id){
-    const h=S.habits.find(x=>x.id===id);
-    document.getElementById('modalTitle').textContent='編輯習慣';
-    document.getElementById('modalName').value=h.name;
-    document.getElementById('modalGoal').value=h.goal;
-    document.getElementById('modalCat').value=h.cat;
-    document.getElementById('modalNote').value=h.note||'';
-  } else {
-    document.getElementById('modalTitle').textContent='新增習慣';
-    ['modalName','modalNote'].forEach(x=>document.getElementById(x).value='');
-    document.getElementById('modalGoal').value=3;
-  }
+// ─────────── MODALS ───────────
+function openHabitModal(id) {
+  const h = id ? S.habits.find(x=>x.id===id) : null;
+  document.getElementById('modalContent').innerHTML = `
+    <h3>${h ? '✏️ 編輯習慣' : '➕ 新增習慣'}</h3>
+    <div class="modal-row"><label>習慣名稱</label><input id="mName" value="${h?h.name:''}" placeholder="例：重訓"></div>
+    <div class="modal-row"><label>週目標次數</label><input id="mGoal" type="number" min="1" max="7" value="${h?h.goal:3}"></div>
+    <div class="modal-row"><label>分類</label>
+      <select id="mCat">
+        ${Object.keys(CAT).map(c=>`<option value="${c}" ${h&&h.cat===c?'selected':''}>${CAT[c].icon} ${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-row"><label>類型</label>
+      <select id="mType">
+        <option value="count" ${!h||h.type==='count'?'selected':''}>📊 累積次數（一般習慣）</option>
+        <option value="daily" ${h&&h.type==='daily'?'selected':''}>📅 每日記錄（可成功/失敗）</option>
+      </select>
+    </div>
+    <div class="modal-row"><label>備註</label><input id="mNote" value="${h?h.note||'':''}" placeholder="例：每次10分鐘"></div>
+    <div class="modal-btns">
+      ${h ? `<button class="btn-secondary" style="color:var(--red)" onclick="deleteHabit(${h.id})">刪除</button>` : ''}
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveHabit(${id||''})">儲存</button>
+    </div>`;
   document.getElementById('modalOverlay').classList.add('show');
 }
-function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
-function saveHabit(){
-  const name=document.getElementById('modalName').value.trim();
-  const goal=parseInt(document.getElementById('modalGoal').value);
+
+function saveHabit(id) {
+  const name = document.getElementById('mName').value.trim();
+  const goal = parseInt(document.getElementById('mGoal').value);
   if(!name||!goal) return;
-  const cat=document.getElementById('modalCat').value,note=document.getElementById('modalNote').value.trim();
-  if(editId){const h=S.habits.find(x=>x.id===editId);Object.assign(h,{name,goal,cat,note});}
-  else S.habits.push({id:Date.now(),name,cat,goal,note,count:0,failed:false});
-  scheduleSave();closeModal();renderTracker();renderMissions();
-  showToast(`✅ 習慣已${editId?'更新':'新增'}：${name}`);
-}
-function addMission(){
-  const name=prompt('任務名稱：'); if(!name) return;
-  const goal=prompt('目標描述：',name)||name;
-  S.missions.push({id:Date.now(),name,type:'skill',goal,reward:100,milestones:[goal],done:[false]});
-  scheduleSave();renderMissions();showToast('🎯 新任務已加入！');
-}
-function deleteHabit(id){
-  if(!confirm('確定要刪除？')) return;
-  S.habits=S.habits.filter(h=>h.id!==id);
-  scheduleSave();renderTracker();renderMissions();
+  const cat = document.getElementById('mCat').value;
+  const type = document.getElementById('mType').value;
+  const note = document.getElementById('mNote').value.trim();
+  if(id) {
+    const h = S.habits.find(x=>x.id===id);
+    Object.assign(h,{name,goal,cat,type,note});
+  } else {
+    S.habits.push({id:Date.now(),name,cat,goal,note,type,logs:[]});
+  }
+  scheduleSave(); closeModal(); renderTracker();
+  showToast(`✅ 習慣已${id?'更新':'新增'}：${name}`);
 }
 
-function toggleSetting(btn){
+let selectedMissionType = 'skill';
+function openMissionModal() {
+  selectedMissionType = 'skill';
+  document.getElementById('modalContent').innerHTML = `
+    <h3>🎯 新增任務</h3>
+    <div class="modal-row"><label>任務名稱</label><input id="mMname" placeholder="例：跑一次馬拉松"></div>
+    <div class="modal-row"><label>目標描述</label><input id="mMgoal" placeholder="例：完成 42km 全馬"></div>
+    <div class="modal-row"><label>任務類型</label>
+      <div class="mission-type-select" id="typeSelect">
+        ${[['skill','技能'],['challenge','挑戰'],['create','創作'],['explore','探索']].map(([v,l])=>
+          `<button class="type-opt ${v==='skill'?'selected':''}" onclick="selectMType('${v}',this)">${l}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="modal-row"><label>里程碑（每行一個）</label>
+      <textarea id="mMiles" placeholder="完成第一步&#10;完成第二步&#10;達成最終目標" rows="4"></textarea>
+    </div>
+    <div class="modal-row"><label>完成獎勵說明（選填，每行一項）</label>
+      <textarea id="mLoot" placeholder="🎖️ 稱號：XXX&#10;🃏 特效：XXX" rows="3"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveMission()">新增任務</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function selectMType(type, btn) {
+  selectedMissionType = type;
+  document.querySelectorAll('.type-opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function saveMission() {
+  const name = document.getElementById('mMname').value.trim(); if(!name) return;
+  const goal = document.getElementById('mMgoal').value.trim() || name;
+  const milesRaw = document.getElementById('mMiles').value.trim().split('\n').filter(Boolean);
+  const lootRaw = document.getElementById('mLoot').value.trim().split('\n').filter(Boolean);
+  const baseExp = {skill:30,challenge:40,create:25,explore:35}[selectedMissionType]||30;
+  const milestones = milesRaw.map((t,i)=>({text:t,exp:baseExp+(i*10),done:false}));
+  const reward = milestones.reduce((s,m)=>s+m.exp,0);
+  S.missions.push({id:Date.now(),name,type:selectedMissionType,goal,reward,milestones,loot:lootRaw});
+  scheduleSave(); closeModal(); renderMissions();
+  showToast('🎯 新任務已加入！');
+}
+
+function deleteHabit(id) {
+  if(!confirm('確定要刪除？')) return;
+  S.habits = S.habits.filter(h=>h.id!==id);
+  scheduleSave(); closeModal(); renderTracker();
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+
+// ─────────── SETTINGS ───────────
+function renderHabitManage() {
+  document.getElementById('habitManageList').innerHTML = S.habits.map(h => {
+    const s = getHabitStats(h);
+    return `<div class="setting-row">
+      <div><div class="setting-label">${CAT[h.cat]?.icon||'⭐'} ${h.name}</div>
+        <div class="setting-sub">目標：${h.goal}次/週 · 完成：${s.success}次 · 類型：${h.type==='daily'?'每日記錄':'累積'}</div></div>
+      <button class="btn-secondary" style="padding:4px 10px;font-size:11px" onclick="openHabitModal(${h.id})">編輯</button>
+    </div>`;
+  }).join('');
+}
+function toggleSetting(btn) {
   btn.classList.toggle('on');
-  if(btn.id==='toggle-noon')S.reminders.noon=btn.classList.contains('on');
-  if(btn.id==='toggle-night')S.reminders.night=btn.classList.contains('on');
+  if(btn.id==='toggle-noon') S.reminders.noon=btn.classList.contains('on');
+  if(btn.id==='toggle-night') S.reminders.night=btn.classList.contains('on');
   scheduleSave();
 }
-function changeName(){
-  const n=prompt('玩家名稱：',S.playerName);
+function changeName() {
+  const n = prompt('玩家名稱：',S.playerName);
   if(n&&n.trim()){S.playerName=n.trim();scheduleSave();renderTracker();}
 }
-function resetWeek(){
+function resetWeek() {
   if(!confirm('確定重置本週？')) return;
-  S.habits.forEach(h=>{h.count=0;h.failed=false;});
-  S.weekStart=getMonday().toISOString();scheduleSave();renderTracker();
-  showToast('🔄 本週已重置！');
+  S.habits.forEach(h=>{h.logs=[];});
+  S.weekStart=getThisMonday().toISOString();scheduleSave();renderTracker();
+  showToast('🔄 本週已重置！新週加油！');
 }
-function requestNotif(){
-  if(!('Notification' in window)){document.getElementById('notifStatus').textContent='不支援通知';return;}
+function requestNotif() {
+  if(!('Notification' in window)){document.getElementById('notifStatus').textContent='不支援';return;}
   Notification.requestPermission().then(p=>{
     document.getElementById('notifStatus').textContent=p==='granted'?'✅ 已啟用':'❌ 被拒絕';
     if(p==='granted') startReminders();
   });
 }
-function startReminders(){
+function startReminders() {
   setInterval(()=>{
     const n=new Date(),hm=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
     if(S.reminders.noon&&hm==='13:00'){
@@ -753,33 +1036,59 @@ function startReminders(){
       if(Notification.permission==='granted') new Notification('🌙 睡前提醒',{body:'習慣都更新了嗎？🐱'});
       addBotMsg('🌙 睡前提醒：快確認今天的打卡再去睡！🐱');
     }
+    // Auto week reset check at Monday 00:00
+    if(hm==='00:00'&&n.getDay()===1){
+      const stored=new Date(S.weekStart);
+      if(stored.toDateString()!==getThisMonday().toDateString()){
+        S.habits.forEach(h=>{h.logs=[];});
+        S.weekStart=getThisMonday().toISOString();
+        scheduleSave();renderTracker();
+        addBotMsg('🌅 新的一週開始啦！上週記錄已封存，繼續加油！🎮🐱');
+      }
+    }
   },60000);
 }
 
-function switchTab(tab){
+// ─────────── UI ───────────
+function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(`page-${tab}`)?.classList.add('active');
-  if(tab==='missions')renderMissions();
-  if(tab==='tracker')renderTracker();
+  if(tab==='missions') renderMissions();
+  if(tab==='tracker') renderTracker();
+  if(tab==='skills') renderSkills();
 }
-function showToast(msg){
-  const t=document.createElement('div');t.className='toast';
+function showToast(msg) {
+  const t=document.createElement('div'); t.className='toast';
   t.innerHTML=`<span>${msg}</span>`;
   document.getElementById('toastContainer').appendChild(t);
   setTimeout(()=>t.remove(),3100);
 }
-function showLevelUp(lv){
+function showLevelUp(lv) {
   const titles=['','初心者','覺醒者','修行者','強者','英雄','傳奇','神話'];
-  document.getElementById('levelupText').textContent=`LEVEL UP!\nLv.${lv}  ${titles[lv]||'神話'}`;
-  document.getElementById('levelupSub').textContent=`✨ 解鎖稱號：${titles[lv]||'神話'} ✨`;
+  const emojis=['','🌱','⚡','🔥','💎','👑','🌟','🐲'];
+  const memes=[
+    '','你終於不是廢物了（誤）',
+    '兩個字：厲害（其實一個字）',
+    '努力的樣子真的很帥',
+    '這個角色我要練滿！',
+    '你已經比99%的人強了（統計局不承認）',
+    '傳說等級，全服公告！',
+    '神話！這不是夢！'
+  ];
+  document.getElementById('levelupEmoji').textContent = emojis[lv]||'🎉';
+  document.getElementById('levelupText').textContent = `LEVEL UP!\nLv.${lv}  ${titles[lv]||'神話'}`;
+  document.getElementById('levelupReward').innerHTML =
+    `<div style="color:var(--accent2);margin-bottom:6px">${memes[lv]||'你到底有多厲害！'}</div>
+     <div style="color:var(--gold)">✨ 稱號解鎖：${titles[lv]||'神話'}</div>`;
   document.getElementById('levelupOverlay').classList.add('show');
-  setTimeout(()=>document.getElementById('levelupOverlay').classList.remove('show'),4000);
+  setTimeout(()=>document.getElementById('levelupOverlay').classList.remove('show'),5000);
 }
 
-async function init(){
-  if(!window._fbReady){
+// ─────────── INIT ───────────
+async function init() {
+  if(!window._fbReady) {
     await new Promise(r=>window.addEventListener('fbReady',r,{once:true}));
   }
   await loadData();
@@ -789,7 +1098,7 @@ async function init(){
   if(!S.reminders.noon) document.getElementById('toggle-noon').classList.remove('on');
   if(!S.reminders.night) document.getElementById('toggle-night').classList.remove('on');
   startReminders();
-  addBotMsg(`喵喵！歡迎回來 ${S.playerName} 🎮 Lv.${S.level}，繼續今天的冒險！💪🐱`);
+  addBotMsg(`喵喵！歡迎回來 ${S.playerName} 🎮 Lv.${S.level}，今天繼續衝！💪🐱`);
 }
 init();
 </script>
