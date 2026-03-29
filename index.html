@@ -192,6 +192,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .add-btn{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.2));border:1px dashed var(--accent);border-radius:12px;padding:12px;width:100%;color:var(--accent2);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
 .add-btn:hover{background:rgba(124,58,237,.3)}
 .mission-type-select{display:flex;gap:6px;flex-wrap:wrap}
+.journal-entry{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s}.journal-entry:hover{border-color:var(--accent);transform:translateY(-1px)}.journal-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-right:4px}.filter-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:var(--body);color:var(--muted);transition:all .2s}.filter-chip.active{border-color:var(--accent2);color:var(--accent2);background:rgba(6,182,212,.1)}.bonus-badge{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(249,115,22,.2));border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:1px 6px;font-size:10px;color:var(--gold);font-weight:700;margin-left:4px}.checkin-memo{font-size:10px;color:var(--accent2);margin-top:3px;font-style:italic}
 .type-opt{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--body);color:var(--text);transition:all .2s}
 .type-opt.selected{border-color:var(--accent2);color:var(--accent2);background:rgba(6,182,212,.1)}
 </style>
@@ -219,6 +220,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <div class="tab" onclick="switchTab('chat')" data-tab="chat">🐱 助理</div>
   <div class="tab" onclick="switchTab('missions')" data-tab="missions">🎯 任務</div>
   <div class="tab" onclick="switchTab('skills')" data-tab="skills">⚡ 技能</div>
+  <div class="tab" onclick="switchTab('journal')" data-tab="journal">📖 歷程</div>
   <div class="tab" onclick="switchTab('settings')" data-tab="settings">⚙️ 設定</div>
 </div>
 
@@ -306,6 +308,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <div id="skillsContainer"></div>
   </div>
 
+
+  <!-- JOURNAL -->
+  <div class="page" id="page-journal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin:0">📖 我的人生歷程</div>
+      <button class="checkin-btn" style="font-size:11px" onclick="openAddJournalEntry()">＋ 新增</button>
+    </div>
+    <div id="journalFilters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+    <div id="journalContainer"></div>
+  </div>
   <!-- SETTINGS -->
   <div class="page" id="page-settings">
     <div class="settings-group">
@@ -428,7 +440,8 @@ const DEFAULT = {
       loot:['✍️ 稱號：創作者','📚 智慧系永久 +15% EXP','🃏 特效：文思泉湧（靈感無限）']
     },
   ],
-  records:[], reminders:{noon:true,night:true}
+  records:[], reminders:{noon:true,night:true},
+  journal:[]
 };
 
 const CAT = {
@@ -494,7 +507,23 @@ const SKILL_DEFS = [
   },
 ];
 
-const EXP_PER = 10, EXPNEXT = lv => lv * 100;
+const EXP_PER = 10;
+// EXP needed to reach next level (cumulative total)
+// EXP to REACH level lv: sum of (i*100) for i=1..lv-1
+// Lv1=0, Lv2=100, Lv3=300, Lv4=600, Lv5=1000...
+function expToReachLevel(lv) {
+  if(lv <= 1) return 0;
+  let total = 0;
+  for(let i = 1; i < lv; i++) total += i * 100;
+  return total;
+}
+// EXP needed for the level-up step FROM lv to lv+1
+function expForStep(lv) { return lv * 100; }
+function currentLevel(totalExp) {
+  let lv = 1;
+  while(expToReachLevel(lv + 1) <= totalExp) lv++;
+  return lv;
+}
 let S = null, saveTimer = null;
 
 function getThisMonday() {
@@ -538,6 +567,7 @@ async function loadData() {
         if(!h.logs) h.logs = [];
         if(!h.type) h.type = 'count';
       });
+      if(!S.journal) S.journal = [];
       // Check week reset (Monday 00:00)
       const storedMonday = new Date(S.weekStart);
       const currMonday = getThisMonday();
@@ -604,7 +634,6 @@ function buildHabitEl(h) {
 
   let blocks = '';
   if(h.type === 'daily') {
-    // Show each log as success or fail in order
     const allLogs = [...h.logs].sort((a,b) => new Date(a.date) - new Date(b.date));
     for(let i = 0; i < h.goal; i++) {
       const log = allLogs[i];
@@ -617,11 +646,14 @@ function buildHabitEl(h) {
       }
     }
   } else {
-    for(let i = 0; i < h.goal; i++) {
+    const successLogs = h.logs.filter(l=>l.action==='checkin');
+    const displayCount = Math.max(stats.success, h.goal);
+    for(let i = 0; i < displayCount; i++) {
       if(i < stats.success) {
-        const log = h.logs.filter(l=>l.action==='checkin')[i];
+        const log = successLogs[i];
         const tt = log ? fmtTime(log.date) : '';
-        blocks += `<div class="block done" style="background:${cfg.color}90" title="${tt}">✓</div>`;
+        const isBonus = i >= h.goal;
+        blocks += `<div class="block done" style="background:${isBonus ? 'var(--gold)' : cfg.color+'90'};${isBonus?'box-shadow:0 0 8px rgba(245,158,11,.6)':''}" title="${tt}">${isBonus?'★':'✓'}</div>`;
       } else {
         blocks += `<div class="block empty"></div>`;
       }
@@ -629,10 +661,12 @@ function buildHabitEl(h) {
   }
 
   // Recent logs (last 3)
-  const recentLogs = [...h.logs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
-  const logHtml = recentLogs.length ? `<div class="habit-log">${recentLogs.map(l =>
-    `<div class="log-entry">${l.action==='checkin'?'✅':'❌'} <span class="log-time">${fmtTime(l.date)}</span></div>`
-  ).join('')}</div>` : '';
+  const recentLogs = [...h.logs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+  const logHtml = recentLogs.length ? `<div class="habit-log">${recentLogs.map(l => {
+    const isBonus = l.bonus ? '<span class="bonus-badge">BONUS</span>' : '';
+    const memo = l.memo ? `<span class="checkin-memo">"${l.memo}"</span>` : '';
+    return `<div class="log-entry">${l.action==='checkin'?'✅':'❌'}${isBonus} <span class="log-time">${fmtTime(l.date)}</span>${memo}</div>`;
+  }).join('')}</div>` : '';
 
   const el = document.createElement('div');
   el.className = 'habit-item' + (stats.fail > 0 && !isDone ? ' partial-fail' : '');
@@ -667,8 +701,13 @@ function buildHabitEl(h) {
 }
 
 function updateCard() {
-  const need = EXPNEXT(S.level), cur = S.totalExp % need;
-  document.getElementById('expFill').style.width = Math.min(cur/need*100, 100) + '%';
+  // Always recalculate level from totalExp — prevents NaN drift
+  S.level = currentLevel(S.totalExp);
+  const prevLvExp = expToReachLevel(S.level);
+  const cur = Math.max(0, S.totalExp - prevLvExp);
+  const need = expForStep(S.level);
+  const pct = need > 0 ? Math.min(cur / need * 100, 100) : 100;
+  document.getElementById('expFill').style.width = pct + '%';
   document.getElementById('expDisplay').textContent = `${cur} / ${need} EXP → Lv.${S.level+1}`;
   document.getElementById('lvBadge').textContent = `⚡ Lv.${S.level}`;
   document.getElementById('playerName').textContent = S.playerName;
@@ -688,21 +727,84 @@ function updateCard() {
 function addLog(id, action, e) {
   e && e.stopPropagation();
   const h = S.habits.find(x => x.id === id); if(!h) return;
+  // Ask for optional memo
+  showCheckinModal(h, action);
+}
+
+function doAddLog(id, action, memo) {
+  const h = S.habits.find(x => x.id === id); if(!h) return;
   const now = new Date().toISOString();
-  h.logs.push({date: now, action});
+  const stats = getHabitStats(h);
+  const isBonus = action === 'checkin' && stats.success >= h.goal;
+  const expGained = isBonus ? Math.round(EXP_PER * 1.5) : EXP_PER;
+  h.logs.push({date: now, action, memo: memo || ''});
   if(action === 'checkin') {
-    S.totalExp += EXP_PER;
-    S.records.push({date:now, habitId:id, habitName:h.name, action:'checkin'});
-    if(S.totalExp >= S.level * EXPNEXT(S.level)) { S.level++; showLevelUp(S.level); }
-    const stats = getHabitStats(h);
-    if(stats.success >= h.goal) addBotMsg(`🎉 ${h.name}本週目標達成！太棒了！+${EXP_PER} EXP ✅`);
-    else addBotMsg(`收到！${h.name} ${stats.success}/${h.goal} ✓ +${EXP_PER} EXP 繼續加油！🐱`);
-    showToast(`✅ ${h.name} 打卡成功 ⚡+${EXP_PER} EXP`);
+    S.totalExp += expGained;
+    S.records.push({date:now, habitId:id, habitName:h.name, action:'checkin', memo: memo||'', bonus: isBonus});
+    const newLv = currentLevel(S.totalExp);
+    if(newLv > S.level) { S.level = newLv; showLevelUp(S.level); }
+    const newStats = getHabitStats(h);
+    if(isBonus) {
+      showToast(`🌟 超標加成！${h.name} ⚡+${expGained} EXP BONUS`);
+      addBotMsg(`🌟 超標打卡！${h.name} 已超過週目標，BONUS +${expGained} EXP！你根本停不下來！🐱🔥`);
+    } else if(newStats.success >= h.goal) {
+      showToast(`✅ ${h.name} 本週目標達成！⚡+${expGained} EXP`);
+      addBotMsg(`🎉 ${h.name}本週目標達成！太棒了！+${expGained} EXP ✅`);
+    } else {
+      showToast(`✅ ${h.name} 打卡成功 ⚡+${expGained} EXP`);
+      addBotMsg(`收到！${h.name} ${newStats.success}/${h.goal} ✓ +${expGained} EXP 繼續加油！🐱`);
+    }
   } else {
     addBotMsg(`${h.name} 今日未達標已記錄 ✗ 決不連續失敗兩次！🐱💪`);
     showToast(`✗ ${h.name} 紅框記錄`);
   }
   scheduleSave(); renderTracker();
+}
+
+function showCheckinModal(h, action) {
+  const isFail = action === 'fail';
+  const stats = getHabitStats(h);
+  const isBonus = !isFail && stats.success >= h.goal;
+  document.getElementById('modalContent').innerHTML = `
+    <h3>${isFail ? '✗ 記錄未達標' : isBonus ? '🌟 超標打卡！' : '✅ 打卡確認'}</h3>
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:${isFail?'var(--red)':isBonus?'var(--gold)':'var(--green)'}">${h.name}</div>
+    ${isBonus ? '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--gold);margin-bottom:12px">🌟 已超過本週目標！繼續打卡獲得 1.5x BONUS EXP！</div>' : ''}
+    <div class="modal-row">
+      <label>備註 memo（選填）</label>
+      <input id="checkinMemo" placeholder="${h.cat==='閱讀'?'例：《原子習慣》第三章，讀完了！':h.cat==='語言'?'例：練習了 STAR 法則回答':h.cat==='運動'?'例：臥推 60kg x 3 組':'今天的感受或記錄...'}">
+    </div>
+    ${h.cat === '閱讀' ? `<div class="modal-row">
+      <label>書名（選填，會加入閱讀清單）</label>
+      <input id="checkinBook" placeholder="例：原子習慣">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+        <input type="checkbox" id="checkinBookDone" style="width:auto">
+        <label for="checkinBookDone" style="font-size:12px;color:var(--text);margin:0">這本書已讀完 ✅</label>
+      </div>
+    </div>` : ''}
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="submitCheckin(${h.id},'${action}')">${isFail?'記錄未達標':'確認打卡'}</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function submitCheckin(id, action) {
+  const memo = (document.getElementById('checkinMemo')?.value||'').trim();
+  const bookEl = document.getElementById('checkinBook');
+  const bookDoneEl = document.getElementById('checkinBookDone');
+  if(bookEl && bookEl.value.trim()) {
+    const bookName = bookEl.value.trim();
+    const isDone = bookDoneEl && bookDoneEl.checked;
+    if(!S.journal) S.journal = [];
+    const existing = S.journal.find(j=>j.type==='book'&&j.title===bookName);
+    if(!existing) {
+      S.journal.push({id:Date.now(),type:'book',title:bookName,done:isDone,date:new Date().toISOString(),notes:memo});
+    } else if(isDone && !existing.done) {
+      existing.done = true; existing.finishedDate = new Date().toISOString();
+    }
+  }
+  closeModal();
+  doAddLog(id, action, memo);
 }
 
 function undoLog(id, e) {
@@ -1002,6 +1104,155 @@ function renderHabitManage() {
     </div>`;
   }).join('');
 }
+
+// ─────────── JOURNAL ───────────
+const JOURNAL_TYPES = {
+  book:    {icon:'📚', label:'書籍',    color:'#8b5cf6', tagCls:'background:rgba(139,92,246,.2);color:#8b5cf6;border:1px solid rgba(139,92,246,.4)'},
+  movie:   {icon:'🎬', label:'電影/影集',color:'#06b6d4', tagCls:'background:rgba(6,182,212,.2);color:#06b6d4;border:1px solid rgba(6,182,212,.4)'},
+  cert:    {icon:'🏅', label:'檢定/證照',color:'#f59e0b', tagCls:'background:rgba(245,158,11,.2);color:#f59e0b;border:1px solid rgba(245,158,11,.4)'},
+  race:    {icon:'🏆', label:'比賽/活動',color:'#ef4444', tagCls:'background:rgba(239,68,68,.2);color:#ef4444;border:1px solid rgba(239,68,68,.4)'},
+  travel:  {icon:'✈️', label:'旅行',    color:'#10b981', tagCls:'background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4)'},
+  milestone:{icon:'⭐', label:'里程碑',  color:'#f97316', tagCls:'background:rgba(249,115,22,.2);color:#f97316;border:1px solid rgba(249,115,22,.4)'},
+};
+
+let journalFilter = 'all';
+
+function renderJournal() {
+  if(!S.journal) S.journal = [];
+  const filters = document.getElementById('journalFilters');
+  const container = document.getElementById('journalContainer');
+
+  // Render filter chips
+  const counts = {};
+  S.journal.forEach(j => { counts[j.type] = (counts[j.type]||0)+1; });
+  filters.innerHTML = `<button class="filter-chip ${journalFilter==='all'?'active':''}" onclick="setJournalFilter('all')">全部 (${S.journal.length})</button>` +
+    Object.entries(JOURNAL_TYPES).map(([k,v]) =>
+      counts[k] ? `<button class="filter-chip ${journalFilter===k?'active':''}" onclick="setJournalFilter('${k}')">${v.icon} ${v.label} (${counts[k]||0})</button>` : ''
+    ).join('');
+
+  const filtered = journalFilter === 'all' ? S.journal : S.journal.filter(j=>j.type===journalFilter);
+  const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  if(!sorted.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:12px">📭</div>
+      <div style="font-size:13px">還沒有任何歷程記錄</div>
+      <div style="font-size:11px;margin-top:6px">打卡閱讀時可以記錄書名，或點右上角新增！</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = sorted.map(entry => {
+    const cfg = JOURNAL_TYPES[entry.type] || JOURNAL_TYPES.milestone;
+    const date = new Date(entry.date).toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
+    const finDate = entry.finishedDate ? new Date(entry.finishedDate).toLocaleDateString('zh-TW',{month:'long',day:'numeric'}) : null;
+    const statusBadge = entry.type==='book'
+      ? (entry.done
+          ? `<span style="font-size:10px;color:var(--green);border:1px solid rgba(16,185,129,.4);border-radius:6px;padding:1px 6px">✅ 已讀完</span>`
+          : `<span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 6px">📖 閱讀中</span>`)
+      : '';
+    return `<div class="journal-entry">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${cfg.icon}</span>
+          <div>
+            <div style="font-size:14px;font-weight:700">${entry.title}</div>
+            <span class="journal-tag" style="${cfg.tagCls}">${cfg.label}</span>
+            ${statusBadge}
+          </div>
+        </div>
+        <button onclick="deleteJournalEntry(${entry.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px">✕</button>
+      </div>
+      ${entry.notes ? `<div style="font-size:12px;color:var(--text);border-left:2px solid ${cfg.color};padding-left:8px;margin-bottom:6px;line-height:1.5">${entry.notes}</div>` : ''}
+      <div style="font-size:10px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap">
+        <span>📅 記錄於 ${date}</span>
+        ${finDate ? `<span>🏁 完成於 ${finDate}</span>` : ''}
+        ${entry.rating ? `<span>${'⭐'.repeat(entry.rating)}</span>` : ''}
+      </div>
+      ${entry.type==='book' && !entry.done ? `<button class="checkin-btn" style="margin-top:8px;font-size:10px;padding:4px 10px" onclick="markBookDone(${entry.id})">標記讀完 ✅</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function setJournalFilter(f) { journalFilter = f; renderJournal(); }
+
+function markBookDone(id) {
+  const e = S.journal.find(x=>x.id===id);
+  if(e) { e.done=true; e.finishedDate=new Date().toISOString(); }
+  scheduleSave(); renderJournal();
+  showToast('✅ 已標記讀完！');
+  addBotMsg(`🎉 恭喜讀完「${e.title}」！記錄在歷程資料庫了 📚🐱`);
+}
+
+function deleteJournalEntry(id) {
+  if(!confirm('確定刪除這筆記錄？')) return;
+  S.journal = S.journal.filter(x=>x.id!==id);
+  scheduleSave(); renderJournal();
+}
+
+function openAddJournalEntry() {
+  document.getElementById('modalContent').innerHTML = `
+    <h3>📖 新增歷程記錄</h3>
+    <div class="modal-row"><label>類型</label>
+      <select id="jType" onchange="updateJournalForm()">
+        ${Object.entries(JOURNAL_TYPES).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-row"><label id="jTitleLabel">標題／名稱</label>
+      <input id="jTitle" placeholder="例：原子習慣"></div>
+    <div class="modal-row"><label>備註</label>
+      <textarea id="jNotes" placeholder="心得、感想、重要記錄..." rows="3"></textarea></div>
+    <div id="jExtraFields"></div>
+    <div class="modal-row"><label>評分（選填）</label>
+      <select id="jRating">
+        <option value="">不評分</option>
+        <option value="1">⭐</option><option value="2">⭐⭐</option>
+        <option value="3">⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="5">⭐⭐⭐⭐⭐</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveJournalEntry()">儲存</button>
+    </div>`;
+  updateJournalForm();
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function updateJournalForm() {
+  const t = document.getElementById('jType').value;
+  const labels = {book:'書名',movie:'片名／劇名',cert:'檢定／證照名稱',race:'比賽／活動名稱',travel:'地點／旅行名稱',milestone:'里程碑名稱'};
+  document.getElementById('jTitleLabel').textContent = labels[t]||'名稱';
+  const extra = document.getElementById('jExtraFields');
+  if(t==='book') {
+    extra.innerHTML = `<div class="modal-row"><div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="jDone" style="width:auto"><label for="jDone" style="font-size:12px;color:var(--text);margin:0">已讀完</label></div></div>`;
+  } else if(t==='cert'||t==='race') {
+    extra.innerHTML = `<div class="modal-row"><label>結果／成績（選填）</label><input id="jResult" placeholder="例：N3 通過、完賽 4:32:00"></div>`;
+  } else { extra.innerHTML = ''; }
+}
+
+function saveJournalEntry() {
+  const title = document.getElementById('jTitle').value.trim();
+  if(!title) return;
+  const type = document.getElementById('jType').value;
+  const notes = document.getElementById('jNotes').value.trim();
+  const ratingEl = document.getElementById('jRating');
+  const rating = ratingEl.value ? parseInt(ratingEl.value) : null;
+  const doneEl = document.getElementById('jDone');
+  const resultEl = document.getElementById('jResult');
+  const entry = {
+    id: Date.now(), type, title, notes, rating,
+    date: new Date().toISOString(),
+    done: doneEl ? doneEl.checked : (type!=='book'),
+    finishedDate: (doneEl&&doneEl.checked)||(type!=='book') ? new Date().toISOString() : null,
+    result: resultEl ? resultEl.value.trim() : null,
+  };
+  if(!S.journal) S.journal = [];
+  S.journal.push(entry);
+  scheduleSave(); closeModal(); renderJournal();
+  showToast(`✅ 已加入歷程：${title}`);
+  addBotMsg(`📖 「${title}」已加入你的人生歷程資料庫！🐱✨`);
+}
+
 function toggleSetting(btn) {
   btn.classList.toggle('on');
   if(btn.id==='toggle-noon') S.reminders.noon=btn.classList.contains('on');
@@ -1058,6 +1309,7 @@ function switchTab(tab) {
   if(tab==='missions') renderMissions();
   if(tab==='tracker') renderTracker();
   if(tab==='skills') renderSkills();
+  if(tab==='journal') renderJournal();
 }
 function showToast(msg) {
   const t=document.createElement('div'); t.className='toast';
