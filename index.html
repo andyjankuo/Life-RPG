@@ -509,20 +509,16 @@ const SKILL_DEFS = [
 
 const EXP_PER = 10;
 // EXP needed to reach next level (cumulative total)
-// EXP to REACH level lv: sum of (i*100) for i=1..lv-1
-// Lv1=0, Lv2=100, Lv3=300, Lv4=600, Lv5=1000...
-function expToReachLevel(lv) {
-  if(lv <= 1) return 0;
-  let total = 0;
-  for(let i = 1; i < lv; i++) total += i * 100;
-  return total;
-}
-// EXP needed for the level-up step FROM lv to lv+1
-function expForStep(lv) { return lv * 100; }
+// Simple flat EXP: every level costs 100 EXP
+// Lv1 at 0, Lv2 at 100, Lv3 at 200, etc.
+const EXP_PER_LEVEL = 100;
 function currentLevel(totalExp) {
-  let lv = 1;
-  while(expToReachLevel(lv + 1) <= totalExp) lv++;
-  return lv;
+  const t = (typeof totalExp === 'number' && isFinite(totalExp)) ? Math.max(0, Math.floor(totalExp)) : 0;
+  return Math.max(1, Math.floor(t / EXP_PER_LEVEL) + 1);
+}
+function expInCurrentLevel(totalExp) {
+  const t = (typeof totalExp === 'number' && isFinite(totalExp)) ? Math.max(0, Math.floor(totalExp)) : 0;
+  return t % EXP_PER_LEVEL;
 }
 let S = null, saveTimer = null;
 
@@ -568,6 +564,9 @@ async function loadData() {
         if(!h.type) h.type = 'count';
       });
       if(!S.journal) S.journal = [];
+      // Sanitize numeric fields from Firebase
+      S.totalExp = (typeof S.totalExp === 'number' && isFinite(S.totalExp)) ? Math.max(0, Math.floor(S.totalExp)) : 0;
+      S.level = currentLevel(S.totalExp);
       // Check week reset (Monday 00:00)
       const storedMonday = new Date(S.weekStart);
       const currMonday = getThisMonday();
@@ -701,12 +700,13 @@ function buildHabitEl(h) {
 }
 
 function updateCard() {
-  // Always recalculate level from totalExp — prevents NaN drift
+  // Sanitize totalExp first
+  if(typeof S.totalExp !== 'number' || !isFinite(S.totalExp)) S.totalExp = 0;
+  S.totalExp = Math.max(0, Math.floor(S.totalExp));
   S.level = currentLevel(S.totalExp);
-  const prevLvExp = expToReachLevel(S.level);
-  const cur = Math.max(0, S.totalExp - prevLvExp);
-  const need = expForStep(S.level);
-  const pct = need > 0 ? Math.min(cur / need * 100, 100) : 100;
+  const cur = expInCurrentLevel(S.totalExp);
+  const need = EXP_PER_LEVEL;
+  const pct = Math.min(cur / need * 100, 100);
   document.getElementById('expFill').style.width = pct + '%';
   document.getElementById('expDisplay').textContent = `${cur} / ${need} EXP → Lv.${S.level+1}`;
   document.getElementById('lvBadge').textContent = `⚡ Lv.${S.level}`;
@@ -742,7 +742,7 @@ function doAddLog(id, action, memo) {
     S.totalExp += expGained;
     S.records.push({date:now, habitId:id, habitName:h.name, action:'checkin', memo: memo||'', bonus: isBonus});
     const newLv = currentLevel(S.totalExp);
-    if(newLv > S.level) { S.level = newLv; showLevelUp(S.level); }
+    if(newLv > (S.level||1)) { S.level = newLv; showLevelUp(S.level); }
     const newStats = getHabitStats(h);
     if(isBonus) {
       showToast(`🌟 超標加成！${h.name} ⚡+${expGained} EXP BONUS`);
@@ -989,7 +989,7 @@ function autoDetectCheckin(text) {
   S.habits.forEach(h => {
     if(text.includes(h.name) && /完成|做了|跑|練|讀|看|上了|去了/.test(text)) {
       h.logs.push({date:new Date().toISOString(),action:'checkin'});
-      S.totalExp += EXP_PER;
+      S.totalExp = (S.totalExp||0) + EXP_PER;
       S.records.push({date:new Date().toISOString(),habitId:h.id,habitName:h.name,action:'chat'});
       matched.push(h.name);
     }
